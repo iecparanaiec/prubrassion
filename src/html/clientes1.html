@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Clientes - Viviendas Sion</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Bootstrap CSS y FontAwesome -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"/>
+  <style>
+    body { background-color: #1b1b1b; color: #f0f0f0; font-family: Arial, sans-serif; padding: 1rem; }
+    h1 { color: #e71b1b; margin-bottom: 1rem; }
+    .nav-tabs .nav-link { color: #f0f0f0; }
+    .nav-tabs .nav-link.active { background-color: #2b2b2b; color: #e71b1b; }
+    .table-container { width: 100%; overflow: auto; margin-bottom: 2rem; }
+    table { color: #f0f0f0; width: 100%; border-collapse: collapse; }
+    th, td {
+      white-space: nowrap;
+      padding: .5rem;
+      border: 1px solid #444;
+      /* permite redimensionar al estilo Excel */
+      resize: horizontal;
+      overflow: auto;
+    }
+    th { position: sticky; top: 0; background-color: #2b2b2b; z-index: 2; cursor: pointer; }
+    .filter-row th { background-color: #3b3b3b; }
+    .filter-row { display: none; }
+    td { background-color: #2b2b2b; }
+    .form-control, .form-select {
+      background-color: #2b2b2b;
+      border-color: #444;
+      color: #f0f0f0;
+    }
+    /* listbox más ancho para ver todo el texto */
+    .form-select-sm { min-width: 120px; }
+    .btn-danger, .btn-success, .btn-filter, .btn-material { min-width: 40px; }
+    .btn-filter { background: transparent; border: 1px solid #444; color: #f0f0f0; }
+    .btn-filter:hover { background: #444; }
+    .btn-filter i { color: #e71b1b; }
+    .btn-material { background-color: #e71b1b; border: none; color: #fff; padding: 0 .5rem; }
+    .btn-material.disabled, .btn-material:disabled { background-color: #555 !important; cursor: not-allowed; }
+    /* Custom scrollbars */
+    .table-container::-webkit-scrollbar { height: 8px; }
+    .table-container::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+    .table-container::-webkit-scrollbar-track { background: #2b2b2b; }
+  </style>
+</head>
+<body>
+  <h1>Clientes</h1>
+  <ul class="nav nav-tabs" id="clientesTab" role="tablist">
+    <li class="nav-item">
+      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#todos">Todos los clientes</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#vm3">VM3</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#reuniones">Reuniones Anexos</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#vencidos">Vencidos</button>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <!-- TODOS -->
+    <div class="tab-pane fade show active" id="todos">
+      <div class="d-flex gap-2 mb-3">
+        <input type="text" id="searchTodos" class="form-control" placeholder="Buscar por texto..." />
+        <button class="btn btn-filter" id="filterTodosBtn"><i class="fas fa-filter"></i></button>
+        <button class="btn btn-danger" id="uploadTodosBtn"><i class="fas fa-upload me-1"></i>Subir Excel</button>
+        <input type="file" id="excelTodosInput" accept=".xls,.xlsx" style="display:none;" />
+        <button class="btn btn-success" id="exportTodosBtn"><i class="fas fa-file-export me-1"></i>Exportar</button>
+      </div>
+      <div class="table-container">
+        <table class="table table-dark" id="todosTable">
+          <thead>
+            <tr id="todosHeader"></tr>
+            <tr class="filter-row" id="todosFilter"></tr>
+          </thead>
+          <tbody id="todosBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- VM3 -->
+    <div class="tab-pane fade" id="vm3">
+      <div class="d-flex gap-2 mb-3">
+        <input type="text" id="searchVM3" class="form-control" placeholder="Buscar VM3..." />
+        <button class="btn btn-filter" id="filterVM3Btn"><i class="fas fa-filter"></i></button>
+        <button class="btn btn-danger" id="uploadVM3Btn"><i class="fas fa-upload me-1"></i>Subir Excel</button>
+        <input type="file" id="excelVM3Input" accept=".xls,.xlsx" style="display:none;" />
+        <button class="btn btn-success" id="exportVM3Btn"><i class="fas fa-file-export me-1"></i>Exportar</button>
+      </div>
+      <div class="table-container">
+        <table class="table table-dark" id="vm3Table">
+          <thead>
+            <tr id="vm3Header"></tr>
+            <tr class="filter-row" id="vm3Filter"></tr>
+          </thead>
+          <tbody id="vm3Body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- REUNIONES -->
+    <div class="tab-pane fade" id="reuniones">
+      <div class="d-flex gap-2 mb-3">
+        <input type="text" id="searchReuniones" class="form-control" placeholder="Buscar Reuniones..." />
+        <button class="btn btn-filter" id="filterReunionesBtn"><i class="fas fa-filter"></i></button>
+        <button class="btn btn-danger" id="uploadReunionesBtn"><i class="fas fa-upload me-1"></i>Subir Excel</button>
+        <input type="file" id="excelReunionesInput" accept=".xls,.xlsx" style="display:none;" />
+        <button class="btn btn-success" id="exportReunionesBtn"><i class="fas fa-file-export me-1"></i>Exportar</button>
+      </div>
+      <div class="table-container">
+        <table class="table table-dark" id="reunionesTable">
+          <thead>
+            <tr id="reunionesHeader"></tr>
+            <tr class="filter-row" id="reunionesFilter"></tr>
+          </thead>
+          <tbody id="reunionesBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- VENCIDOS -->
+    <div class="tab-pane fade" id="vencidos">
+      <div class="d-flex gap-2 mb-3">
+        <input type="text" id="searchVencidos" class="form-control" placeholder="Buscar Vencidos..." />
+        <button class="btn btn-filter" id="filterVencidosBtn"><i class="fas fa-filter"></i></button>
+        <button class="btn btn-danger" id="uploadVencidosBtn"><i class="fas fa-upload me-1"></i>Subir Excel</button>
+        <input type="file" id="excelVencidosInput" accept=".xls,.xlsx" style="display:none;" />
+        <button class="btn btn-success" id="exportVencidosBtn"><i class="fas fa-file-export me-1"></i>Exportar</button>
+      </div>
+      <div class="table-container">
+        <table class="table table-dark" id="vencidosTable">
+          <thead>
+            <tr id="vencidosHeader"></tr>
+            <tr class="filter-row" id="vencidosFilter"></tr>
+          </thead>
+          <tbody id="vencidosBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Materiales -->
+  <div class="modal fade" id="matModal"><div class="modal-dialog"><div class="modal-content bg-dark text-light">
+    <div class="modal-header">
+      <h5 class="modal-title">Materiales por Cliente</h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body" id="matBody"></div>
+  </div></div></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const sheets = {
+        todos:    { data: [], raw: null, expected: 'Nro Contrato', headerId: 'todosHeader',    filterId: 'todosFilter',    bodyId: 'todosBody',    fileId: 'excelTodosInput',    uploadId: 'uploadTodosBtn',    exportId: 'exportTodosBtn',    searchId: 'searchTodos',    tableId: 'todosTable',    filterBtnId: 'filterTodosBtn' },
+        vm3:      { data: [], raw: null, expected: 'Cliente',      headerId: 'vm3Header',      filterId: 'vm3Filter',      bodyId: 'vm3Body',      fileId: 'excelVM3Input',      uploadId: 'uploadVM3Btn',      exportId: 'exportVM3Btn',      searchId: 'searchVM3',      tableId: 'vm3Table',      filterBtnId: 'filterVM3Btn' },
+        reuniones:{ data: [], raw: null, expected: 'Nro Contrato', headerId: 'reunionesHeader', filterId: 'reunionesFilter', bodyId: 'reunionesBody', fileId: 'excelReunionesInput', uploadId: 'uploadReunionesBtn', exportId: 'exportReunionesBtn', searchId: 'searchReuniones', tableId: 'reunionesTable', filterBtnId: 'filterReunionesBtn' },
+        vencidos: { data: [], raw: null, expected: 'Nro Contrato', headerId: 'vencidosHeader',  filterId: 'vencidosFilter',  bodyId: 'vencidosBody',  fileId: 'excelVencidosInput',  uploadId: 'uploadVencidosBtn',  exportId: 'exportVencidosBtn',  searchId: 'searchVencidos',  tableId: 'vencidosTable',  filterBtnId: 'filterVencidosBtn' }
+      };
+      const dropdownCols = [
+        'Modelo (m2)','Anexo','Desglose','Lo tenemos?','Confirmación mail','Motivo','¿Tiene Canje?',
+        '¿Quién reviste?','Platea','Servicios','Fotos','Lleva Medianeras','Aislaciones','Ubicación Google Maps',
+        'Garantías','G.A.','Fletes','Forma de pago','Estado','revestimiento','Cenefa'
+      ];
+
+      // restaurar datos persistidos
+      Object.keys(sheets).forEach(key => {
+        const saved = localStorage.getItem(key + '_data');
+        if (saved) {
+          sheets[key].data = JSON.parse(saved);
+          renderTable(key);
+        }
+      });
+
+      function parseSheet(key) {
+        const s = sheets[key];
+        const wb = XLSX.read(s.raw, { type:'binary' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const all = XLSX.utils.sheet_to_json(ws, { header:1, defval:'' });
+        const idx = all.findIndex(r => r.includes(s.expected));
+        if (idx < 0) return;
+        const headers = all[idx].map(h=>{ const t=String(h).trim(); return t && !/EMPTY/.test(t)?t:null; });
+        s.data = all.slice(idx+1)
+          .map(r=>{ let obj={}; headers.forEach((h,i)=>{ if(h) obj[h]=r[i]; }); return obj; })
+          .filter(r=>Object.values(r).some(v=>v!==''));
+        localStorage.setItem(key+'_data', JSON.stringify(s.data));
+      }
+
+      function renderTable(key) {
+        const s = sheets[key];
+        const hdr = document.getElementById(s.headerId);
+        const flt = document.getElementById(s.filterId);
+        const bd  = document.getElementById(s.bodyId);
+        hdr.innerHTML = ''; flt.innerHTML = ''; bd.innerHTML = '';
+        if (!s.data.length) return;
+        let cols = Object.keys(s.data[0]);
+        if (key==='todos') cols.shift();
+        // encabezados
+        cols.forEach(c=>{
+          const th = document.createElement('th');
+          th.innerText = c;
+          // al hacer clic: colapsar / restaurar ancho
+          th.addEventListener('click', ()=>{
+            if (th.style.width) th.style.width = '';
+            else th.style.width = '30px';
+          });
+          hdr.appendChild(th);
+        });
+        // filtros
+        cols.forEach(c=>{
+          const th = document.createElement('th');
+          const sel = document.createElement('select');
+          sel.className = 'form-select form-select-sm';
+          sel.innerHTML = '<option value="">Todos</option>' +
+            Array.from(new Set(s.data.map(r=>r[c]).filter(v=>v))).map(v=>`<option>${v}</option>`).join('');
+          sel.onchange = ()=>applyFilter(key);
+          th.appendChild(sel);
+          flt.appendChild(th);
+        });
+        // filas
+        s.data.forEach((row,idx)=>{
+          const tr = document.createElement('tr');
+          cols.forEach(c=>{
+            const td = document.createElement('td');
+            // nombre + botón Materiales
+            if (c==='Nombre' && key==='todos') {
+              td.style.display='flex';
+              td.style.justifyContent='space-between';
+              td.style.alignItems='center';
+              const span = document.createElement('span');
+              span.innerText = row[c]||'';
+              td.appendChild(span);
+              const matKey = 'materials_'+idx;
+              const hasMat = !!localStorage.getItem(matKey);
+              const btn = document.createElement('button');
+              btn.className='btn-material';
+              btn.innerText='Materiales';
+              btn.disabled = !hasMat;
+              btn.onclick = ()=> hasMat && showMat(idx);
+              td.appendChild(btn);
+            }
+            // maps
+            else if (c.toLowerCase().includes('ubicaci')) {
+              const btn = document.createElement('button');
+              btn.className='btn btn-sm btn-primary';
+              btn.innerHTML='<i class="fas fa-map-marker-alt"></i>';
+              btn.onclick = ()=> window.open(
+                'https://www.google.com/maps/search/'+encodeURIComponent(row[c]||''), '_blank'
+              );
+              td.appendChild(btn);
+            }
+            // dropdownCols
+            else if (dropdownCols.includes(c)) {
+              const sel = document.createElement('select');
+              sel.className='form-select form-select-sm';
+              Array.from(new Set(s.data.map(r=>r[c]).filter(v=>v))).forEach(v=>{
+                const o = document.createElement('option');
+                o.value=o.innerText=v;
+                sel.appendChild(o);
+              });
+              sel.value = row[c];
+              sel.onchange = e=> row[c] = e.target.value;
+              td.appendChild(sel);
+            }
+            // editable
+            else {
+              td.contentEditable = 'true';
+              td.innerText = row[c]||'';
+              td.addEventListener('input', e=> row[c] = e.target.innerText);
+            }
+            tr.appendChild(td);
+          });
+          bd.appendChild(tr);
+        });
+      }
+
+      function applyFilter(key) {
+        const s = sheets[key];
+        const term = document.getElementById(s.searchId).value.toLowerCase();
+        const selects = document.getElementById(s.filterId).querySelectorAll('select');
+        document.querySelectorAll(`#${s.tableId} tbody tr`).forEach(tr=>{
+          const textMatch = tr.innerText.toLowerCase().includes(term);
+          const colMatch = Array.from(selects).every((sel,i)=>
+            !sel.value || tr.children[i].innerText===sel.value
+          );
+          tr.style.display = (textMatch && colMatch) ? '' : 'none';
+        });
+      }
+
+      function showMat(idx) {
+        const m = JSON.parse(localStorage.getItem('materials_'+idx)||'{}');
+        document.getElementById('matBody').innerHTML=`
+          <ul class="list-group list-group-flush bg-dark text-light">
+            <li class="list-group-item"><strong>Área:</strong> ${m.area||'N/D'}</li>
+            <li class="list-group-item"><strong>Ladrillos:</strong> ${m.bricks||'N/D'}</li>
+            <li class="list-group-item"><strong>Cemento:</strong> ${m.cement||'N/D'}</li>
+            <li class="list-group-item"><strong>Arena:</strong> ${m.sand||'N/D'}</li>
+            <li class="list-group-item"><strong>Platicor:</strong> ${m.plasticor||'N/D'}</li>
+            <li class="list-group-item"><strong>Hierro:</strong> ${m.iron||'N/D'}</li>
+          </ul>`;
+        new bootstrap.Modal(document.getElementById('matModal')).show();
+      }
+
+      function handleFile(key) {
+        return e=> {
+          const f=e.target.files[0]; if(!f) return;
+          const r=new FileReader();
+          r.onload = ev=> { sheets[key].raw=ev.target.result; parseSheet(key); renderTable(key); };
+          r.readAsBinaryString(f);
+          e.target.value='';
+        };
+      }
+      function exportData(key) {
+        const d=sheets[key].data;
+        if(!d.length) return alert('Primero carga datos en '+key);
+        const wb=XLSX.utils.book_new(), ws=XLSX.utils.json_to_sheet(d);
+        XLSX.utils.book_append_sheet(wb,ws,key);
+        XLSX.writeFile(wb,`${key}_${new Date().toISOString().slice(0,10)}.xlsx`);
+      }
+
+      Object.keys(sheets).forEach(key=>{
+        const s=sheets[key];
+        document.getElementById(s.filterBtnId).onclick = ()=>{
+          const row=document.getElementById(s.filterId);
+          row.style.display = row.style.display==='table-row'?'none':'table-row';
+        };
+        document.getElementById(s.uploadId).onclick   = ()=> document.getElementById(s.fileId).click();
+        document.getElementById(s.fileId).onchange    = handleFile(key);
+        document.getElementById(s.exportId).onclick   = ()=> exportData(key);
+        document.getElementById(s.searchId).addEventListener('input',()=>applyFilter(key));
+      });
+
+      document.querySelectorAll('button[data-bs-toggle="tab"]').forEach(btn=>{
+        btn.addEventListener('shown.bs.tab',e=>{
+          const tgt=e.target.getAttribute('data-bs-target').substring(1);
+          if(sheets[tgt] && sheets[tgt].data.length) renderTable(tgt);
+        });
+      });
+
+    });
+  </script>
+</body>
+</html>

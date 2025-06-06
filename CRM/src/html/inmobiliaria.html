@@ -1,0 +1,248 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CRM Inmobiliaria Sion</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Bootstrap CSS -->
+  <link 
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
+    rel="stylesheet"
+  >
+  <!-- Material Icons -->
+  <link 
+    href="https://fonts.googleapis.com/icon?family=Material+Icons" 
+    rel="stylesheet"
+  >
+  <!-- Estilos personalizados -->
+  <style>
+    :root {
+      --primary-color: #0069d9; /* Azul inmobiliaria */
+      --bg-color: #f8f9fa;
+      --text-color: #343a40;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0; padding: 0;
+    }
+    /* Navbar */
+    .navbar {
+      background-color: var(--primary-color) !important;
+      min-height: 70px;
+    }
+    .navbar-brand .logo-img {
+      width: 36px; height: 36px;
+      object-fit: cover; border-radius: 50%;
+      margin-right: 8px;
+    }
+    .icon-btn { color: #fff; margin-left: 1rem; }
+    /* Offcanvas */
+    .offcanvas {
+      background-color: var(--bg-color);
+    }
+    .offcanvas .nav-link { color: var(--text-color) !important; }
+    /* Layout */
+    .main-container { display: flex; width: 100%; }
+    .sidebar {
+      width: 200px; background-color: #e9ecef;
+      border-right: 1px solid #dee2e6;
+    }
+    @media (max-width: 991.98px) {
+      .sidebar { display: none; }
+    }
+    .sidebar .nav-link {
+      color: var(--text-color); padding: .75rem 1rem;
+    }
+    .sidebar .nav-link.active {
+      background-color: var(--primary-color);
+      color: #fff;
+    }
+    .content {
+      flex: 1; position: relative; overflow: hidden;
+    }
+    .section-content { display: none; width:100%; height:100%; }
+    .section-content.active { display: block; }
+    #mainIframe {
+      width: 100%; height: calc(100vh - 70px);
+      border: none;
+    }
+    /* Botón IA */
+    .chat-button {
+      position: fixed; bottom: 20px; right: 20px;
+      background-color: var(--primary-color);
+      color: #fff; border: none; border-radius: 50%;
+      width: 56px; height: 56px; font-size: 24px;
+      z-index: 1000; display: flex;
+      align-items: center; justify-content: center;
+    }
+    .chat-popup {
+      position: fixed; bottom: 90px; right: 20px;
+      width: 320px; height: 480px;
+      background: #fff; border:1px solid #ccc;
+      border-radius: 8px; display: none;
+      flex-direction: column; overflow: hidden;
+      z-index: 999;
+    }
+    .chat-header {
+      background-color: var(--primary-color);
+      color: #fff; padding: .5rem 1rem;
+      display: flex; justify-content: space-between;
+      align-items: center;
+    }
+    .chat-popup iframe { flex:1; border:none; }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <button 
+        class="navbar-toggler" 
+        type="button" 
+        data-bs-toggle="offcanvas" 
+        data-bs-target="#offcanvasMenu"
+        aria-controls="offcanvasMenu"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand d-flex align-items-center ms-2" href="#">
+        <img src="logo.jpg" alt="Logo" class="logo-img">
+        CRM Inmobiliaria
+      </a>
+      <div class="d-flex ms-auto">
+        <div class="icon-btn d-none d-lg-block">
+          <span class="material-icons">notifications</span>
+        </div>
+        <div class="icon-btn d-none d-lg-block">
+          Hola, Agente!
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- OFFCANVAS (MÓVIL) -->
+  <div 
+    class="offcanvas offcanvas-start" 
+    tabindex="-1" 
+    id="offcanvasMenu"
+    aria-labelledby="offcanvasMenuLabel"
+  >
+    <div class="offcanvas-header">
+      <h5 id="offcanvasMenuLabel">Menú</h5>
+      <button 
+        type="button" 
+        class="btn-close text-reset" 
+        data-bs-dismiss="offcanvas"
+        aria-label="Close"
+      ></button>
+    </div>
+    <div class="offcanvas-body p-0">
+      <nav class="nav flex-column">
+        <a class="nav-link menu-item" data-iframe-src="dashboard.html" href="javascript:;">Dashboard</a>
+        <a class="nav-link menu-item" data-iframe-src="propiedades.html" href="javascript:;">Propiedades</a>
+        <a class="nav-link menu-item" data-iframe-src="clientes.html" href="javascript:;">Clientes</a>
+        <a class="nav-link menu-item" data-iframe-src="agentes.html" href="javascript:;">Agentes</a>
+        <a class="nav-link menu-item" data-iframe-src="citas.html" href="javascript:;">Citas</a>
+        <a class="nav-link menu-item" data-iframe-src="ventas.html" href="javascript:;">Ventas</a>
+        <a class="nav-link menu-item" data-iframe-src="reportes.html" href="javascript:;">Reportes</a>
+        <a class="nav-link menu-item" data-iframe-src="configuracion.html" href="javascript:;">Configuración</a>
+        <a class="nav-link" href="logout.html"><span class="material-icons">logout</span> Salir</a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- LAYOUT PRINCIPAL -->
+  <div class="main-container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar d-none d-lg-block">
+      <nav class="nav flex-column">
+        <a class="nav-link menu-item active" data-iframe-src="dashboard.html" href="javascript:;">
+          <span class="material-icons">dashboard</span> Dashboard
+        </a>
+        <a class="nav-link menu-item" data-iframe-src="propiedades.html" href="javascript:;">
+          <span class="material-icons">home_work</span> Propiedades
+        </a>
+        <a class="nav-link menu-item" data-iframe-src="clientes.html" href="javascript:;">
+          <span class="material-icons">group</span> Clientes
+        </a>
+        <a class="nav-link menu-item" data-iframe-src="agentes.html" href="javascript:;">
+          <span class="material-icons">engineering</span> Agentes
+        </a>
+        <a class="nav-link menu-item" data-iframe-src="citas.html" href="javascript:;">
+          <span class="material-icons">event</span> Citas
+        </a>
+        <a class="nav-link menu-item" data-iframe-src="ventas.html" href="javascript:;">
+          <span class="material-icons">attach_money</span> Ventas
+        </a>
+        <a class="nav-link menu-item" data-iframe-src="reportes.html" href="javascript:;">
+          <span class="material-icons">bar_chart</span> Reportes
+        </a>
+        <a class="nav-link menu-item" data-iframe-src="configuracion.html" href="javascript:;">
+          <span class="material-icons">settings</span> Configuración
+        </a>
+        <a class="nav-link" href="logout.html">
+          <span class="material-icons">logout</span> Salir
+        </a>
+      </nav>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="content">
+      <div class="section-content active" id="iframeContainer">
+        <iframe id="mainIframe" src="dashboard.html"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTÓN ASISTENTE IA -->
+  <button id="openChatBtn" class="chat-button">
+    <span class="material-icons">chat</span>
+  </button>
+  <div id="chatPopup" class="chat-popup">
+    <div class="chat-header">
+      <span>Asistente IA</span>
+      <button id="closeChatBtn" class="btn-close btn-close-white"></button>
+    </div>
+    <iframe src="asistente.html"></iframe>
+  </div>
+
+  <!-- BOOTSTRAP JS -->
+  <script 
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+  ></script>
+  <!-- Script de navegación -->
+  <script>
+    const offcanvasEl = document.getElementById('offcanvasMenu');
+    const offcanvas = new bootstrap.Offcanvas(offcanvasEl);
+
+    const menuItems = document.querySelectorAll('.menu-item');
+    const iframeContainer = document.getElementById('iframeContainer');
+    const mainIframe = document.getElementById('mainIframe');
+
+    menuItems.forEach(item => {
+      item.addEventListener('click', () => {
+        // menú activo
+        menuItems.forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        // cargar iframe
+        const src = item.getAttribute('data-iframe-src');
+        if (src) mainIframe.src = src;
+        // cerrar offcanvas en móvil
+        offcanvas.hide();
+      });
+    });
+
+    // Chat popup
+    const chatBtn = document.getElementById('openChatBtn');
+    const chatPopup = document.getElementById('chatPopup');
+    const closeChat = document.getElementById('closeChatBtn');
+    chatBtn.addEventListener('click', () => chatPopup.style.display = 'flex');
+    closeChat.addEventListener('click', () => chatPopup.style.display = 'none');
+  </script>
+
+</body>
+</html>

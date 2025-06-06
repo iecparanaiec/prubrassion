@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CRM - Viviendas Sion</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Bootstrap CSS (v5.x) -->
+  <link 
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+  />
+
+  <!-- Material Icons (opcional, para iconos) -->
+  <link 
+    href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    rel="stylesheet"
+  />
+
+  <!-- Estilos personalizados -->
+  <style>
+    /* =========================
+       COLORES Y VARIABLES
+       ========================= */
+    :root {
+      --primary-color: #e71b1b; /* Rojo principal */
+      --bg-color: #222121;
+      --text-color: #b9b9b9;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+    }
+
+    /* =========================
+       NAVBAR SUPERIOR
+       ========================= */
+    .navbar {
+      min-height: 80px; /* Aumenta la altura del navbar */
+      background-color: var(--primary-color) !important; /* Usa el rojo principal */
+    }
+    .navbar-brand {
+      font-weight: bold;
+      text-transform: capitalize;
+    }
+    /* Logo circular */
+    .navbar-brand .logo-img {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    .icon-btn {
+      color: #676767;
+      margin-left: 1rem;
+      cursor: pointer;
+    }
+    .icon-btn:hover {
+      opacity: 0.8;
+    }
+
+    /* =========================
+       OFFCANVAS (menú móvil)
+       ========================= */
+    /* Modificación para fondo oscuro y líneas divisorias en gris oscuro */
+    .offcanvas {
+      background-color: #1b1b1b !important;
+    }
+    .offcanvas-header {
+      background-color: #1b1b1b !important;
+      border-bottom: 1px solid #333 !important;
+      color: #fff !important;
+    }
+    .offcanvas-body {
+      background-color: #1b1b1b !important;
+      color: var(--text-color) !important;
+    }
+    .offcanvas-body .nav-link {
+      border-bottom: 1px solid #333 !important;
+      color: var(--text-color) !important;
+    }
+    .offcanvas-body .nav-link:hover {
+      background-color: #222 !important;
+      color: #fff !important;
+    }
+
+    /* =========================
+       LAYOUT PRINCIPAL
+       ========================= */
+    .main-container {
+      display: flex;
+      width: 100%;
+      min-height: calc(100vh - 56px); /* Altura total menos la navbar */
+    }
+
+    /* =========================
+       SIDEBAR (pantallas >= lg)
+       ========================= */
+    .sidebar {
+      width: 220px;
+      background-color: #2b2b2b;
+      border-right: 1px solid #555353;
+      min-height: 100vh;
+    }
+    @media (max-width: 991.98px) {
+      .sidebar {
+        display: none;
+      }
+    }
+    .sidebar .nav-link {
+      color: #e5e5e5;
+      border-bottom: 1px solid #3a3a3a;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      transition: background-color 0.3s;
+    }
+    .sidebar .nav-link:hover {
+      background-color: #eee;
+    }
+    .sidebar .nav-link span.material-icons {
+      margin-right: 0.5rem;
+    }
+    .sidebar .nav-link.active {
+      background-color: var(--primary-color);
+      color: #414141;
+    }
+
+    /* =========================
+       CONTENIDO PRINCIPAL
+       ========================= */
+    .content {
+      flex: 1;
+      padding: 1rem;
+      position: relative;
+      overflow: hidden; /* Para que el iframe no sobrepase */
+    }
+
+    /* Ocultamos secciones por defecto */
+    .section-content {
+      display: none;
+      width: 100%;
+      height: 100%;
+    }
+    .section-content.active {
+      display: block;
+    }
+
+    /* Ajuste del iframe (para secciones Inicio, Clientes, etc.) */
+    #mainIframe {
+      width: 100%;
+      height: calc(100vh - 80px); /* Ajusta según la altura del navbar */
+      border: none;
+    }
+
+    /* =========================
+       SECCIÓN CHATS (pestañas internas)
+       ========================= */
+    .main-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #1b1b1b;
+      border-bottom: 1px solid #ddd;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+    }
+    .tabs {
+      display: flex;
+    }
+    .tab {
+      background: transparent;
+      border: none;
+      margin-right: 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+      position: relative;
+      padding: 0.5rem 0;
+      color: var(--text-color);
+    }
+    .tab.active {
+      color: var(--primary-color);
+      font-weight: bold;
+      border-bottom: 2px solid var(--primary-color);
+    }
+    .filters {
+      display: flex;
+      align-items: center;
+    }
+    .filters label {
+      margin: 0 0.5rem 0 1rem;
+      font-size: 0.9rem;
+    }
+    .filters select {
+      padding: 0.25rem;
+      font-size: 0.9rem;
+    }
+    .content-container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* =========================
+       SMARTPHONE CONTAINER
+       ========================= */
+    .smartphone-container {
+      background-color: #333;
+      border-radius: 40px;
+      width: 360px;        /* ancho “simulado” de un smartphone */
+      max-width: 100%;
+      overflow: hidden;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      position: relative;
+      border: 2px solid #555;
+      margin-bottom: 1rem; /* espaciado inferior en mobile */
+    }
+    .smartphone-container iframe {
+      border: none;
+      width: 100%;
+      height: 70vh;     
+      max-height: 70vh; 
+      background-color: #000;
+    }
+
+    /* =========================
+       BOTONES DE PROVINCIAS
+       ========================= */
+    .btn-province {
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    #addChatBtn {
+      margin-bottom: 0.5rem;
+    }
+
+    /* =========================
+       TOGGLE SWITCH
+       ========================= */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 28px;
+      margin-left: 1rem;
+    }
+    .switch input {
+      opacity: 0; 
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #666666;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: var(--primary-color);
+    }
+    input:checked + .slider:before {
+      transform: translateX(22px);
+    }
+
+    /* =========================
+       PROVINCE-CHAT LAYOUT
+       ========================= */
+    .province-chat {
+      display: none; /* Solo se muestra la provincia activa */
+    }
+    .province-chat.active {
+      display: flex;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+    }
+    .province-chat .col-md-6 {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* =========================
+       HISTORIAL DE CHATS (columna derecha)
+       ========================= */
+   /* =============================
+   HISTORIAL DE CHATS
+============================= */
+/* =============================
+   HISTORIAL DE CHATS
+============================= */
+.daily-chats {
+  background-color: #505050;
+  border: 1px solid #505050;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-left: 1rem; 
+  margin-bottom: 1rem; 
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  flex: 1;
+}
+
+.daily-chats h5 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+/* Selector específico para sobrescribir Bootstrap */
+.daily-chats ul.list-group > li.list-group-item {
+  background-color: #bebebe !important;  /* Fondo gris claro */
+  color: #333 !important;                /* Texto gris oscuro */
+  border: none !important;
+  border-bottom: 1px solid #bbb !important; /* Línea divisoria gris suave */
+  padding: 0.75rem !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+.daily-chats ul.list-group > li.list-group-item:last-child {
+  border-bottom: none !important;
+}
+
+.daily-chats ul.list-group > li.list-group-item a {
+  text-decoration: none;
+  color: #333 !important;  /* Texto gris oscuro en enlaces */
+}
+
+.daily-chats ul.list-group > li.list-group-item a:hover {
+  color: var(--primary-color) !important;
+}
+
+.time-label {
+  color: #666 !important;
+  font-size: 0.8rem !important;
+  margin-left: 1rem !important;
+}
+
+
+
+    /* =========================
+       MEDIA QUERIES
+       ========================= */
+    @media (max-width: 768px) {
+      .smartphone-container iframe {
+        height: 60vh;
+        max-height: 60vh;
+      }
+      .province-chat.active {
+        flex-direction: column;
+      }
+      .daily-chats {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR SUPERIOR (botón hamburguesa a la izquierda) -->
+  <!-- Quitamos .bg-danger y usamos el color con .navbar-dark + nuestro CSS -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <!-- Botón hamburguesa para offcanvas (solo se ve en móviles) -->
+      <button 
+        class="navbar-toggler" 
+        type="button" 
+        data-bs-toggle="offcanvas" 
+        data-bs-target="#offcanvasMenu" 
+        aria-controls="offcanvasMenu"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Nombre/Logo de la app (a la derecha del botón) -->
+      <a class="navbar-brand d-flex align-items-center ms-2" href="#">
+        <img src="assets/images/logo.jpg" alt="Logo" class="logo-img" />
+        Viviendas Sion
+      </a>
+
+      <!-- Sección de iconos a la derecha (notificaciones y usuario) -->
+      <div class="d-flex ms-auto">
+        <div class="icon-btn d-none d-lg-block">
+          <span class="material-icons">notifications</span>
+        </div>
+        <div class="icon-btn d-none d-lg-block">
+          Hola Maxi, bienvenido!
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- OFFCANVAS MENU (para móviles) -->
+  <div 
+    class="offcanvas offcanvas-start" 
+    tabindex="-1" 
+    id="offcanvasMenu" 
+    aria-labelledby="offcanvasMenuLabel"
+  >
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasMenuLabel">Menú</h5>
+      <button 
+        type="button" 
+        class="btn-close btn-close-white" 
+        data-bs-dismiss="offcanvas" 
+        aria-label="Close"
+      ></button>
+    </div>
+    <div class="offcanvas-body p-0">
+      <!-- Mismo menú lateral, pero en offcanvas -->
+      <nav class="nav flex-column">
+        <!-- 
+          data-iframe-src="..." -> indica que abrirá un HTML en el iframe principal.
+          data-section-target="#chats" -> indica que abrirá la sección de Chats de este index.html
+        -->
+        <a 
+          class="nav-link menu-item d-flex align-items-center" 
+          data-iframe-src="/html/tablero.html"
+          href="javascript:void(0)"
+        >
+          <span class="material-icons me-1">home</span> 
+          Recordatorios
+        </a>
+        <a 
+          class="nav-link menu-item d-flex align-items-center" 
+          data-section-target="#chats"
+          href="javascript:void(0)"
+        >
+          <span class="material-icons me-1">chat</span>
+          Chats
+        </a>
+        <a 
+          class="nav-link menu-item d-flex align-items-center" 
+          data-iframe-src="/html/clientes1.html"
+          href="javascript:void(0)"
+        >
+          <span class="material-icons me-1">group</span>
+          Clientes
+        </a>
+        
+        
+  
+</a>
+<a 
+class="nav-link menu-item d-flex align-items-center" 
+data-iframe-src="/html/ventas/ventas.html"
+href="javascript:void(0)"
+>
+<span class="material-icons me-1">sell</span>
+Ventas
+</a>
+
+        <a 
+          class="nav-link menu-item d-flex align-items-center" 
+          data-iframe-src="/html/configuracion.html"
+          href="javascript:void(0)"
+        >
+          <span class="material-icons me-1">settings</span>
+          Configuración
+        </a>
+        <a 
+          class="nav-link menu-item d-flex align-items-center" 
+          data-iframe-src="salir.html"
+          href="javascript:void(0)"
+        >
+          <span class="material-icons me-1">logout</span>
+          Salir
+        </a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- LAYOUT PRINCIPAL: SIDEBAR (solo en escritorio) + CONTENIDO -->
+  <div class="main-container">
+    <!-- SIDEBAR (visible en pantallas >= lg) -->
+    <aside class="sidebar d-none d-lg-block">
+      <nav class="nav flex-column">
+        <a 
+          class="nav-link menu-item" 
+          data-iframe-src="/html/tablero.html"
+          href="javascript:void(0)"
+        >
+          <span class="material-icons">home</span>
+          Recordatorios
+        </a>
+        <a 
+          class="nav-link menu-item" 
+          data-section-target="#chats"
+          href="javascript:void(0)"
+        >
+          <span class="material-icons">chat</span>
+          Chats
+        </a>
+        <a 
+  class="nav-link menu-item" 
+  data-iframe-src="/html/clientes1.html"
+  href="javascript:void(0)"
+>
+          <span class="material-icons">group</span>
+          Clientes
+        </a>
+        <a 
+        class="nav-link menu-item" 
+        data-iframe-src="/html/usuarios.html"
+        href="javascript:void(0)"
+      >
+        <span class="material-icons">person_outline</span>
+        Usuarios
+      </a>
+      
+        <a 
+          class="nav-link menu-item" 
+          data-iframe-src="/html/configuracion.html"
+          href="javascript:void(0)"
+        >
+          <span class="material-icons">settings</span>
+          Configuración
+        </a>
+        <a 
+  
+>
+  
+  
+</a>
+<a 
+  class="nav-link menu-item" 
+  data-iframe-src="/html/ventas/ventas.html"
+  href="javascript:void(0)"
+>
+  <span class="material-icons">sell</span>
+  Ventas
+</a>
+<a 
+          class="nav-link menu-item" 
+          data-iframe-src="compras.html"
+          href="javascript:void(0)"
+        >
+        <span class="material-icons">shopping_cart</span>
+
+          Compras
+        </a>
+        <a 
+          class="nav-link menu-item" 
+          data-iframe-src="salir.html"
+          href="javascript:void(0)"
+        >
+          <span class="material-icons">logout</span>
+          Salir
+        </a>
+      </nav>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="content">
+      <!-- 1) Contenedor (iframe) para secciones como "Inicio", "Clientes", etc. -->
+      <div class="section-content active" id="iframeContainer">
+        <!-- Por defecto, cargamos "tablero.html" en el iframe -->
+        <iframe id="mainIframe" src="/html/tablero.html"></iframe>
+      </div>
+
+      <!-- 2) Sección CHATS (con pestañas internas) -->
+      <div class="section-content" id="chats">
+        <!-- Encabezado con pestañas y filtros solo para la sección de Chats -->
+        <div class="main-header">
+          <div class="tabs">
+            <button class="tab active" data-tab-target="#abiertas">ABIERTAS</button>
+            <button class="tab" data-tab-target="#resueltos">RESUELTOS</button>
+            <button class="tab" data-tab-target="#busca">BUSCA</button>
+          </div>
+          <div class="filters">
+            <label for="filter-status">Estado:</label>
+            <select id="filter-status">
+              <option value="todos">Todos</option>
+              <option value="pendiente">Pendientes</option>
+              <option value="resuelto">Resueltos</option>
+            </select>
+
+            <label for="filter-view">Vista:</label>
+            <select id="filter-view">
+              <option value="lista">Lista</option>
+              <option value="filas">Filas</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Contenedor para el contenido de cada pestaña de Chats -->
+        <div class="content-container">
+          <!-- Pestaña "ABIERTAS": 4 chatbots, botón "Agregar", toggle... -->
+          <div class="tab-content active" id="abiertas">
+            <h3>Chats de Provincias</h3>
+            
+            <!-- Botones de provincia + Botón Agregar + Toggle Switch -->
+            <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
+              <div>
+                <button 
+                  class="btn btn-danger btn-province" 
+                  data-province-target="#chatCorrientes"
+                >
+                  Corrientes
+                </button>
+                <button 
+                  class="btn btn-danger btn-province" 
+                  data-province-target="#chatEntreRios"
+                >
+                  Entre Ríos
+                </button>
+                <button 
+                  class="btn btn-danger btn-province" 
+                  data-province-target="#chatNeuquen"
+                >
+                  Neuquén
+                </button>
+                <button 
+                  class="btn btn-danger btn-province" 
+                  data-province-target="#chatMarDelPlata"
+                >
+                  Mar del Plata
+                </button>
+                <button 
+                  class="btn btn-outline-danger ms-2" 
+                  id="addChatBtn"
+                >
+                  Agregar
+                </button>
+              </div>
+              <!-- Toggle switch (habilitar/deshabilitar chatbot) -->
+              <label class="switch">
+                <input type="checkbox" id="enableChatbotToggle">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <!-- ========== Corrientes ========== -->
+            <div class="province-chat active" id="chatCorrientes">
+              <div class="row">
+                <!-- Celular a la izquierda -->
+                <div class="col-md-6 d-flex justify-content-center">
+                  <div class="smartphone-container">
+                    <!-- name="phoneFrameCorrientes" para abrir links en el mismo iframe -->
+                    <iframe 
+                      name="phoneFrameCorrientes" 
+                      src="chatbot_corrientes.html"
+                    ></iframe>
+                  </div>
+                </div>
+                <!-- Historial del día a la derecha -->
+                <div class="col-md-6">
+                  <div class="daily-chats">
+                    <h5>Historial del día: 29/03/2025</h5>
+                    <ul class="list-group">
+                      <li class="list-group-item">
+                        <a 
+                          href="clientes/Corrientes/chatbot_corrientes_marta.html" 
+                          target="phoneFrameCorrientes"
+                        >
+                          Marta Gomez
+                        </a>
+                        <span class="time-label">12:30 PM</span>
+                      </li>
+                      <li class="list-group-item">
+                        <a 
+                          href="clientes/Corrientes/chatbot_corrientes_julian.html" 
+                          target="phoneFrameCorrientes"
+                        >
+                          Julián Franchi
+                        </a>
+                        <span class="time-label">12:45 PM</span>
+                      </li>
+                      <li class="list-group-item">
+                        <a 
+                          href="clientes/Corrientes/chatbot_corrientes_goro.html" 
+                          target="phoneFrameCorrientes"
+                        >
+                          Goró Agustín
+                        </a>
+                        <span class="time-label">1:00 PM</span>
+                      </li>
+                      <li class="list-group-item">
+                        <a 
+                          href="clientes/Corrientes/chatbot_corrientes_daniel.html" 
+                          target="phoneFrameCorrientes"
+                        >
+                          Daniel Román
+                        </a>
+                        <span class="time-label">1:15 PM</span>
+                      </li>
+                      <li class="list-group-item">
+                        <a 
+                          href="clientes/Corrientes/chatbot_corrientes_maria.html" 
+                          target="phoneFrameCorrientes"
+                        >
+                          María Pérez
+                        </a>
+                        <span class="time-label">1:20 PM</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== Entre Ríos ========== -->
+            <div class="province-chat" id="chatEntreRios">
+              <div class="row">
+                <div class="col-md-6 d-flex justify-content-center">
+                  <div class="smartphone-container">
+                    <iframe 
+                      name="phoneFrameEntreRios" 
+                      src="chatbot_entrerios.html"
+                    ></iframe>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="daily-chats">
+                    <h5>Historial del día: 29/03/2025</h5>
+                    <ul class="list-group">
+                      <li class="list-group-item">
+                        <a 
+                          href="clientes/Entre_Rios/chatbot_entrerios_carla.html" 
+                          target="phoneFrameEntreRios"
+                        >
+                          Carla López
+                        </a>
+                        <span class="time-label">09:15 AM</span>
+                      </li>
+                      <li class="list-group-item">
+                        <a 
+                          href="clientes/Entre_Rios/chatbot_entrerios_pedro.html" 
+                          target="phoneFrameEntreRios"
+                        >
+                          Pedro Silva
+                        </a>
+                        <span class="time-label">09:40 AM</span>
+                      </li>
+                      <li class="list-group-item">
+                        <a 
+                          href="clientes/Entre_Rios/chatbot_entrerios_rocio.html" 
+                          target="phoneFrameEntreRios"
+                        >
+                          Rocío Benítez
+                        </a>
+                        <span class="time-label">10:00 AM</span>
+                      </li>
+                      <li class="list-group-item">
+                        <a 
+                          href="clientes/Entre_Rios/chatbot_entrerios_hugo.html" 
+                          target="phoneFrameEntreRios"
+                        >
+                          Hugo Barrera
+                        </a>
+                        <span class="time-label">10:20 AM</span>
+                      </li>
+                      <li class="list-group-item">
+                        <a 
+                          href="clientes/Entre_Rios/chatbot_entrerios_silvia.html" 
+                          target="phoneFrameEntreRios"
+                        >
+                          Silvia Maldonado
+                        </a>
+                        <span class="time-label">10:30 AM</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== Neuquén ========== -->
+            <div class="province-chat" id="chatNeuquen">
+              <div class="row">
+                <div class="col-md-6 d-flex justify-content-center">
+                  <div class="smartphone-container">
+                    <iframe 
+                      name="phoneFrameNeuquen" 
+                      src="chatbot_neuquen.html"
+                    ></iframe>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="daily-chats">
+                    <h5>Historial del día: 29/03/2025</h5>
+                    <ul class="list-group">
+                      <li class="list-group-item">
+                        <a 
+                          href="clientes/Neuquen/chatbot_neuquen_miguel.html" 
+                          target="phoneFrameNeuquen"
+                        >
+                          Miguel Toledo
+                        </a>
+                        <span class="time-label">11:10 AM</span>
+                      </li>
+                      <li class="list-group-item">
+                        <a 
+                          href="clientes/Neuquen/chatbot_neuquen_ana.html" 
+                          target="phoneFrameNeuquen"
+                        >
+                          Ana Lucía
+                        </a>
+                        <span class="time-label">11:25 AM</span>
+                      </li>
+                      <li class="list-group-item">
+                        <a 
+                          href="clientes/Neuquen/chatbot_neuquen_walter.html" 
+                          target="phoneFrameNeuquen"
+                        >
+                          Walter Quintana
+                        </a>
+                        <span class="time-label">11:40 AM</span>
+                      </li>
+                      <li class="list-group-item">
+                        <a 
+                          href="clientes/Neuquen/chatbot_neuquen_sofia.html" 
+                          target="phoneFrameNeuquen"
+                        >
+                          Sofía Garay
+                        </a>
+                        <span class="time-label">11:55 AM</span>
+                      </li>
+                      <li class="list-group-item">
+                        <a 
+                          href="clientes/Neuquen/chatbot_neuquen_pablo.html" 
+                          target="phoneFrameNeuquen"
+                        >
+                          Pablo Durán
+                        </a>
+                        <span class="time-label">12:05 PM</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== Mar del Plata ========== -->
+            <div class="province-chat" id="chatMarDelPlata">
+              <div class="row">
+                <div class="col-md-6 d-flex justify-content-center">
+                  <div class="smartphone-container">
+                    <iframe 
+                      name="phoneFrameMarDelPlata" 
+                      src="chatbot_mardelplata.html"
+                    ></iframe>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="daily-chats">
+                    <h5>Historial del día: 29/03/2025</h5>
+                    <ul class="list-group">
+                      <li class="list-group-item">
+                        <a 
+                          href="clientes/Mar_del_Plata/chatbot_mardelplata_lucia.html" 
+                          target="phoneFrameMarDelPlata"
+                        >
+                          Lucía Fernández
+                        </a>
+                        <span class="time-label">2:10 PM</span>
+                      </li>
+                      <li class="list-group-item">
+                        <a 
+                          href="clientes/Mar_del_Plata/chatbot_mardelplata_jose.html" 
+                          target="phoneFrameMarDelPlata"
+                        >
+                          José Castro
+                        </a>
+                        <span class="time-label">2:25 PM</span>
+                      </li>
+                      <li class="list-group-item">
+                        <a 
+                          href="clientes/Mar_del_Plata/chatbot_mardelplata_marcela.html" 
+                          target="phoneFrameMarDelPlata"
+                        >
+                          Marcela Rivas
+                        </a>
+                        <span class="time-label">2:35 PM</span>
+                      </li>
+                      <li class="list-group-item">
+                        <a 
+                          href="clientes/Mar_del_Plata/chatbot_mardelplata_roberto.html" 
+                          target="phoneFrameMarDelPlata"
+                        >
+                          Roberto Vidal
+                        </a>
+                        <span class="time-label">2:50 PM</span>
+                      </li>
+                      <li class="list-group-item">
+                        <a 
+                          href="clientes/Mar_del_Plata/chatbot_mardelplata_andrea.html" 
+                          target="phoneFrameMarDelPlata"
+                        >
+                          Andrea Gil
+                        </a>
+                        <span class="time-label">3:00 PM</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS (v5.x) + Popper.js (incluido en el bundle) -->
+  <script 
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+  ></script>
+
+  <!-- Script personalizado (manejo de secciones, pestañas, chatbots y toggle) -->
+  <script>
+    /***********************************************************
+     * 1. INICIALIZACIÓN DEL OFFCANVAS Y MANEJO DEL MENÚ
+     ***********************************************************/
+    // Obtenemos el elemento del offcanvas y lo inicializamos
+    const offcanvasMenuEl = document.getElementById('offcanvasMenu');
+    const offcanvasMenuBs = new bootstrap.Offcanvas(offcanvasMenuEl);
+
+    // Referencias a contenedores
+    const menuItems = document.querySelectorAll('.menu-item');
+    const iframeContainer = document.getElementById('iframeContainer');
+    const mainIframe = document.getElementById('mainIframe');
+    const chatsSection = document.getElementById('chats');
+
+    // Función para ocultar todas las "secciones" y mostrar la que se desee
+    function showIframeContainer(src) {
+      // Mostramos iframeContainer y cargamos la página correspondiente
+      iframeContainer.classList.add('active');
+      chatsSection.classList.remove('active');
+      if (src) {
+        mainIframe.src = src;
+      }
+    }
+
+    function showChatsSection() {
+      iframeContainer.classList.remove('active');
+      chatsSection.classList.add('active');
+    }
+
+    menuItems.forEach((item) => {
+      item.addEventListener('click', () => {
+        // Quitar 'active' de todos los items del menú
+        menuItems.forEach((i) => i.classList.remove('active'));
+        // Marcar el actual como activo
+        item.classList.add('active');
+
+        // Verificamos si el item abre la sección interna (#chats)
+        // o una página externa (data-iframe-src).
+        const sectionTarget = item.getAttribute('data-section-target');
+        const iframeSrc = item.getAttribute('data-iframe-src');
+
+        if (sectionTarget === '#chats') {
+          // Mostrar la sección de chats
+          showChatsSection();
+        } else if (iframeSrc) {
+          // Mostrar el iframe con la URL especificada
+          showIframeContainer(iframeSrc);
+        }
+
+        // Cerrar el offcanvas (menú) en móvil automáticamente
+        offcanvasMenuBs.hide();
+      });
+    });
+
+    // Al cargar la página, por defecto se muestra "tablero.html" (en el src del iframe).
+    // Si deseas que al cargar muestre la sección de Chats, cambia el "active" inicial.
+
+    /***********************************************************
+     * 2. FUNCIONALIDAD DE LAS PESTAÑAS DENTRO DE CHATS
+     ***********************************************************/
+    const tabs = document.querySelectorAll(".tab");
+    const tabContents = document.querySelectorAll(".tab-content");
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        // Remover 'active' de todos los tabs
+        tabs.forEach((t) => t.classList.remove("active"));
+        // Agregar 'active' al tab clicado
+        tab.classList.add("active");
+
+        // Ocultar todo el contenido de pestañas
+        tabContents.forEach((content) => {
+          content.classList.remove("active");
+        });
+
+        // Mostrar el contenido correspondiente
+        const target = document.querySelector(tab.dataset.tabTarget);
+        if (target) {
+          target.classList.add("active");
+        }
+      });
+    });
+
+    /***********************************************************
+     * 3. FILTROS DE CHATS (ejemplo simple)
+     ***********************************************************/
+    const filterStatus = document.getElementById("filter-status");
+    const filterView = document.getElementById("filter-view");
+
+    filterStatus.addEventListener("change", (e) => {
+      console.log("Cambió el filtro de estado a:", e.target.value);
+      // Aquí podrías filtrar la lista de conversaciones según el estado
+    });
+
+    filterView.addEventListener("change", (e) => {
+      console.log("Cambió la vista a:", e.target.value);
+      // Aquí podrías cambiar la forma de mostrar la lista de conversaciones
+    });
+
+    /***********************************************************
+     * 4. MANEJO DE LOS CHATBOTS DE PROVINCIAS
+     ***********************************************************/
+    const provinceButtons = document.querySelectorAll('[data-province-target]');
+    const provinceChats = document.querySelectorAll('.province-chat');
+    const addChatBtn = document.getElementById('addChatBtn');
+
+    // Al hacer clic en un botón de provincia, mostrar la row correspondiente
+    provinceButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Quitar la clase 'active' de todas las .province-chat
+        provinceChats.forEach(chat => chat.classList.remove('active'));
+
+        // Activar solo la provincia seleccionada
+        const targetSelector = btn.getAttribute('data-province-target');
+        const targetChat = document.querySelector(targetSelector);
+        if (targetChat) {
+          targetChat.classList.add('active');
+        }
+      });
+    });
+
+    // Botón "Agregar" para crear más chats dinámicamente
+    addChatBtn.addEventListener('click', () => {
+      const newProvinceName = prompt('Ingrese el nombre de la nueva provincia:');
+      const newProvinceUrl = prompt('Ingrese la URL (o archivo) del chatbot:');
+      
+      // Solo crear si se ingresaron datos
+      if (newProvinceName && newProvinceUrl) {
+        // Generar un ID único a partir del nombre
+        const newId = 'chat' + newProvinceName.replace(/\s+/g, '');
+
+        // Crear el botón
+        const newBtn = document.createElement('button');
+        newBtn.classList.add('btn', 'btn-danger', 'btn-province', 'me-2');
+        newBtn.setAttribute('data-province-target', '#' + newId);
+        newBtn.textContent = newProvinceName;
+
+        // Crear el contenedor de la provincia
+        const newProvinceDiv = document.createElement('div');
+        newProvinceDiv.classList.add('province-chat', 'row');
+        newProvinceDiv.id = newId;
+
+        // Col-izquierda: smartphone-container
+        const leftCol = document.createElement('div');
+        leftCol.classList.add('col-md-6', 'd-flex', 'justify-content-center', 'mb-3');
+        const phoneContainer = document.createElement('div');
+        phoneContainer.classList.add('smartphone-container');
+        const newIframe = document.createElement('iframe');
+        const frameName = 'phoneFrame' + newProvinceName.replace(/\s+/g, '');
+        newIframe.setAttribute('name', frameName);
+        newIframe.src = newProvinceUrl;
+        phoneContainer.appendChild(newIframe);
+        leftCol.appendChild(phoneContainer);
+
+        // Col-derecha: daily-chats
+        const rightCol = document.createElement('div');
+        rightCol.classList.add('col-md-6');
+        const dailyChatsDiv = document.createElement('div');
+        dailyChatsDiv.classList.add('daily-chats');
+        const h5 = document.createElement('h5');
+        h5.textContent = 'Historial del día: 29/03/2025';
+        const ul = document.createElement('ul');
+        ul.classList.add('list-group');
+
+        // Ejemplo de 3 nombres con horas
+        const dummyData = [
+          { name: 'Juan Pérez', time: '12:10 PM' },
+          { name: 'Laura Díaz', time: '12:25 PM' },
+          { name: 'Pablo Kahn', time: '12:40 PM' },
+        ];
+
+        dummyData.forEach(person => {
+          const li = document.createElement('li');
+          li.classList.add('list-group-item');
+          const link = document.createElement('a');
+          link.href = newProvinceUrl;   // Podrías usar links distintos si cada persona tiene su propia sesión
+          link.target = frameName;
+          link.textContent = person.name;
+
+          // Hora a la derecha
+          const timeSpan = document.createElement('span');
+          timeSpan.classList.add('time-label');
+          timeSpan.textContent = person.time;
+
+          li.appendChild(link);
+          li.appendChild(timeSpan);
+          ul.appendChild(li);
+        });
+
+        dailyChatsDiv.appendChild(h5);
+        dailyChatsDiv.appendChild(ul);
+        rightCol.appendChild(dailyChatsDiv);
+
+        // Estructura final
+        newProvinceDiv.appendChild(leftCol);
+        newProvinceDiv.appendChild(rightCol);
+
+        // Insertar la nueva provincia en la pestaña "abiertas"
+        const abiertasTab = document.getElementById('abiertas');
+        const provinceChatContainer = abiertasTab.querySelector('.content-container');
+        provinceChatContainer.appendChild(newProvinceDiv);
+
+        // Insertar el nuevo botón antes del "Agregar"
+        addChatBtn.parentNode.insertBefore(newBtn, addChatBtn);
+
+        // Desactivar otras .province-chat y activar la nueva
+        provinceChats.forEach(chat => chat.classList.remove('active'));
+        newProvinceDiv.classList.add('active');
+
+        // Escuchar clic del nuevo botón
+        newBtn.addEventListener('click', () => {
+          provinceChats.forEach(chat => chat.classList.remove('active'));
+          newProvinceDiv.classList.add('active');
+        });
+      }
+    });
+
+    /***********************************************************
+     * 5. TOGGLE SWITCH (Habilitar / Deshabilitar chatbot)
+     ***********************************************************/
+    const enableChatbotToggle = document.getElementById('enableChatbotToggle');
+    enableChatbotToggle.addEventListener('change', () => {
+      if (enableChatbotToggle.checked) {
+        console.log('Chatbot habilitado');
+        // Aquí podrías agregar lógica para "tomar el control" o permitir chatbot
+      } else {
+        console.log('Chatbot deshabilitado');
+        // Lógica para deshabilitar chatbot automático, etc.
+      }
+    });
+  </script>
+  <!-- Botón flotante de chat -->
+<button id="openChatBtn" class="chat-button">
+  <span class="material-icons">chat</span>
+</button>
+
+<!-- Ventana de chat flotante -->
+<div id="chatPopup" class="chat-popup">
+  <div class="chat-header">
+    <span>Asistente IA</span>
+    <button id="closeChatBtn" class="close-chat">✖</button>
+  </div>
+  <iframe src="chatbot.html"></iframe>
+</div>
+
+<style>
+  :root {
+    --primary-color: #e71b1b;
+    --bg-color: #222121;
+    --text-color: #b9b9b9;
+    --popup-header-bg: #1b1b1b;
+    --popup-bg: #2b2b2b;
+    --border-color: #555353;
+  }
+
+  /* Botón flotante */
+  .chat-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+    cursor: pointer;
+    z-index: 9999;
+    box-shadow: 0 0 8px rgba(231, 27, 27, 0.6);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .chat-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 16px rgba(231, 27, 27, 0.8);
+  }
+
+  /* Popup de chat */
+  .chat-popup {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 350px;
+    height: 500px;
+    background-color: var(--popup-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 9998;
+  }
+
+  .chat-header {
+    background-color: var(--popup-header-bg);
+    color: var(--primary-color);
+    padding: 10px 16px;
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--primary-color);
+  }
+
+  .close-chat {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .chat-popup iframe {
+    flex: 1;
+    border: none;
+    background-color: var(--bg-color);
+  }
+</style>
+
+<script>
+  const chatBtn = document.getElementById('openChatBtn');
+  const chatPopup = document.getElementById('chatPopup');
+  const closeChat = document.getElementById('closeChatBtn');
+
+  chatBtn.addEventListener('click', () => {
+    chatPopup.style.display = 'flex';
+  });
+
+  closeChat.addEventListener('click', () => {
+    chatPopup.style.display = 'none';
+  });
+</script>
+
+</body>
+</html>

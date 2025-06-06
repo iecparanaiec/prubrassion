@@ -1,0 +1,74 @@
+/* =========================
+   PESTAÑAS (nav-tabs)
+   ========================= */
+   .nav-tabs {
+    background-color: #2b2b2b;           /* mismo bg de sidebar */
+    border-bottom: 1px solid #555353;    /* misma línea divisoria */
+  }
+  .nav-tabs .nav-link {
+    color: #b9b9b9;                      /* texto gris claro */
+    background-color: transparent;
+    border: none;
+    margin-right: 1rem;
+  }
+  .nav-tabs .nav-link:hover {
+    color: #fff;
+  }
+  .nav-tabs .nav-link.active {
+    color: #222121;                      /* texto oscuro sobre rojo */
+    background-color: #e71b1b;           /* rojo principal */
+    font-weight: bold;
+    border-radius: 0.25rem 0.25rem 0 0;
+  }
+  
+  /* =========================
+     FORMULARIOS
+     ========================= */
+  #promociones-form .form-label {
+    min-width: 110px;
+  }
+  
+  .form-control,
+  .form-select,
+  .form-range {
+    background-color: #2b2b2b;           /* input oscuro */
+    color: #b9b9b9;
+    border: 1px solid #555353;
+  }
+  .form-control:focus,
+  .form-select:focus {
+    box-shadow: none;
+    border-color: #e71b1b;               /* foco rojo */
+  }
+  
+  /* =========================
+     TABLAS
+     ========================= */
+  .table {
+    color: #b9b9b9;
+  }
+  .table thead th {
+    background-color: #2b2b2b;
+    color: #e71b1b;
+    border-bottom: 1px solid #555353;
+  }
+  .table tbody tr {
+    background-color: #222121;
+  }
+  .table tbody tr:hover {
+    background-color: #333333;
+  }
+  
+  /* =========================
+     BOTONES
+     ========================= */
+  .btn-primary {
+    background-color: #e71b1b;
+    border-color: #e71b1b;
+  }
+  .btn-primary:hover,
+  .btn-primary:focus {
+    background-color: #c41616;
+    border-color: #c41616;
+  }
+  

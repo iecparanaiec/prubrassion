@@ -1,0 +1,350 @@
+<!-- propiedades.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Propiedades — CRM Inmobiliaria</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Bootstrap CSS -->
+  <link 
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
+    rel="stylesheet"
+  >
+  <!-- Material Icons -->
+  <link 
+    href="https://fonts.googleapis.com/icon?family=Material+Icons" 
+    rel="stylesheet"
+  >
+  <!-- Estilos personalizados -->
+  <style>
+    :root {
+      --primary-color: #0069d9;
+      --bg-color: #f8f9fa;
+      --text-color: #343a40;
+    }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 1rem;
+    }
+    h2 {
+      color: var(--primary-color);
+    }
+    .modal-header {
+      background-color: var(--primary-color);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Encabezado -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Propiedades</h2>
+    <button id="addPropertyBtn" class="btn btn-primary">
+      <span class="material-icons align-middle">add</span> Agregar Propiedad
+    </button>
+  </div>
+
+  <!-- Filtros -->
+  <div class="row mb-3">
+    <div class="col-md-4 mb-2">
+      <input 
+        type="text" 
+        id="searchInput" 
+        class="form-control" 
+        placeholder="Buscar por título o ubicación"
+      >
+    </div>
+    <div class="col-md-3 mb-2">
+      <select id="filterType" class="form-select">
+        <option value="">Tipo: Todos</option>
+        <option value="Apartamento">Apartamento</option>
+        <option value="Casa">Casa</option>
+        <option value="Local">Local</option>
+        <option value="Terreno">Terreno</option>
+      </select>
+    </div>
+    <div class="col-md-3 mb-2">
+      <select id="filterState" class="form-select">
+        <option value="">Estado: Todos</option>
+        <option value="Disponible">Disponible</option>
+        <option value="Reservado">Reservado</option>
+        <option value="Vendido">Vendido</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Tabla de propiedades -->
+  <div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Título</th>
+          <th>Tipo</th>
+          <th>Ubicación</th>
+          <th>Precio</th>
+          <th>Estado</th>
+          <th>Agente</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="propertiesTableBody">
+        <!-- Se llenará dinámicamente -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal: Agregar / Editar Propiedad -->
+  <div 
+    class="modal fade" 
+    id="propertyModal" 
+    tabindex="-1" 
+    aria-labelledby="propertyModalLabel" 
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="propertyModalLabel">Nueva Propiedad</h5>
+          <button 
+            type="button" 
+            class="btn-close btn-close-white" 
+            data-bs-dismiss="modal" 
+            aria-label="Cerrar"
+          ></button>
+        </div>
+        <form id="propertyForm">
+          <div class="modal-body">
+            <input type="hidden" id="propertyId">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="propertyTitle" class="form-label">Título</label>
+                <input 
+                  type="text" 
+                  id="propertyTitle" 
+                  class="form-control" 
+                  required
+                >
+              </div>
+              <div class="col-md-6">
+                <label for="propertyType" class="form-label">Tipo</label>
+                <select id="propertyType" class="form-select" required>
+                  <option value="">Seleccione...</option>
+                  <option value="Apartamento">Apartamento</option>
+                  <option value="Casa">Casa</option>
+                  <option value="Local">Local</option>
+                  <option value="Terreno">Terreno</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="propertyLocation" class="form-label">Ubicación</label>
+                <input 
+                  type="text" 
+                  id="propertyLocation" 
+                  class="form-control" 
+                  required
+                >
+              </div>
+              <div class="col-md-6">
+                <label for="propertyPrice" class="form-label">Precio</label>
+                <input 
+                  type="number" 
+                  id="propertyPrice" 
+                  class="form-control" 
+                  required 
+                  min="0"
+                >
+              </div>
+              <div class="col-md-6">
+                <label for="propertyState" class="form-label">Estado</label>
+                <select id="propertyState" class="form-select" required>
+                  <option value="">Seleccione...</option>
+                  <option value="Disponible">Disponible</option>
+                  <option value="Reservado">Reservado</option>
+                  <option value="Vendido">Vendido</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="propertyAgent" class="form-label">Agente</label>
+                <input 
+                  type="text" 
+                  id="propertyAgent" 
+                  class="form-control"
+                  placeholder="Nombre del agente"
+                  required
+                >
+              </div>
+              <div class="col-12">
+                <label for="propertyDescription" class="form-label">Descripción</label>
+                <textarea 
+                  id="propertyDescription" 
+                  class="form-control" 
+                  rows="3"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button 
+              type="button" 
+              class="btn btn-secondary" 
+              data-bs-dismiss="modal"
+            >Cancelar</button>
+            <button type="submit" class="btn btn-primary">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS bundle (Popper incluido) -->
+  <script 
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+  ></script>
+
+  <!-- Lógica JavaScript -->
+  <script>
+    // Referencias
+    const tableBody       = document.getElementById('propertiesTableBody');
+    const addBtn          = document.getElementById('addPropertyBtn');
+    const modalEl         = document.getElementById('propertyModal');
+    const modal           = new bootstrap.Modal(modalEl);
+    const form            = document.getElementById('propertyForm');
+    const inputs          = {
+      id:           document.getElementById('propertyId'),
+      title:        document.getElementById('propertyTitle'),
+      type:         document.getElementById('propertyType'),
+      location:     document.getElementById('propertyLocation'),
+      price:        document.getElementById('propertyPrice'),
+      state:        document.getElementById('propertyState'),
+      agent:        document.getElementById('propertyAgent'),
+      description:  document.getElementById('propertyDescription'),
+    };
+    const searchInput     = document.getElementById('searchInput');
+    const filterType      = document.getElementById('filterType');
+    const filterState     = document.getElementById('filterState');
+
+    let properties = JSON.parse(localStorage.getItem('propiedades')) || [];
+
+    // Guardar en localStorage
+    function saveAll() {
+      localStorage.setItem('propiedades', JSON.stringify(properties));
+    }
+
+    // Renderizar tabla con filtros
+    function renderTable() {
+      const search = searchInput.value.toLowerCase();
+      const typeF  = filterType.value;
+      const stateF = filterState.value;
+      tableBody.innerHTML = '';
+      properties
+        .filter(p => {
+          const matchText = p.title.toLowerCase().includes(search) ||
+                            p.location.toLowerCase().includes(search);
+          const matchType  = typeF ? p.type === typeF : true;
+          const matchState = stateF ? p.state === stateF : true;
+          return matchText && matchType && matchState;
+        })
+        .forEach(p => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${p.id}</td>
+            <td>${p.title}</td>
+            <td>${p.type}</td>
+            <td>${p.location}</td>
+            <td>$ ${parseFloat(p.price).toLocaleString()}</td>
+            <td>${p.state}</td>
+            <td>${p.agent}</td>
+            <td>
+              <button class="btn btn-sm btn-outline-secondary edit-btn" data-id="${p.id}">
+                <span class="material-icons">edit</span>
+              </button>
+              <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${p.id}">
+                <span class="material-icons">delete</span>
+              </button>
+            </td>
+          `;
+          tableBody.appendChild(tr);
+        });
+    }
+
+    // Abrir modal para nueva o editar
+    function openModal(editId = null) {
+      if (editId) {
+        const prop = properties.find(x => x.id == editId);
+        inputs.id.value          = prop.id;
+        inputs.title.value       = prop.title;
+        inputs.type.value        = prop.type;
+        inputs.location.value    = prop.location;
+        inputs.price.value       = prop.price;
+        inputs.state.value       = prop.state;
+        inputs.agent.value       = prop.agent;
+        inputs.description.value = prop.description;
+        modalEl.querySelector('.modal-title').textContent = 'Editar Propiedad';
+      } else {
+        form.reset();
+        inputs.id.value = '';
+        modalEl.querySelector('.modal-title').textContent = 'Nueva Propiedad';
+      }
+      modal.show();
+    }
+
+    // Eliminar propiedad
+    function deleteProperty(id) {
+      if (confirm('¿Eliminar esta propiedad?')) {
+        properties = properties.filter(p => p.id != id);
+        saveAll();
+        renderTable();
+      }
+    }
+
+    // Manejo de envío de formulario
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const data = {
+        id:          inputs.id.value || Date.now(),
+        title:       inputs.title.value.trim(),
+        type:        inputs.type.value,
+        location:    inputs.location.value.trim(),
+        price:       inputs.price.value,
+        state:       inputs.state.value,
+        agent:       inputs.agent.value.trim(),
+        description: inputs.description.value.trim(),
+      };
+      if (inputs.id.value) {
+        // Editar
+        properties = properties.map(p => p.id == data.id ? data : p);
+      } else {
+        // Nuevo
+        properties.push(data);
+      }
+      saveAll();
+      renderTable();
+      modal.hide();
+    });
+
+    // Delegación de eventos para Editar / Eliminar
+    tableBody.addEventListener('click', e => {
+      const id = e.target.closest('button')?.dataset.id;
+      if (!id) return;
+      if (e.target.closest('.edit-btn')) openModal(id);
+      if (e.target.closest('.delete-btn')) deleteProperty(id);
+    });
+
+    // Listeners de UI
+    addBtn.addEventListener('click', () => openModal());
+    searchInput.addEventListener('input', renderTable);
+    filterType.addEventListener('change', renderTable);
+    filterState.addEventListener('change', renderTable);
+
+    // Inicializar tabla
+    renderTable();
+  </script>
+</body>
+</html>

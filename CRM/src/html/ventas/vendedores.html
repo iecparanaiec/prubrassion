@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Vendedores — CRM ViviendaCión</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <!-- Font Awesome -->
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    rel="stylesheet"
+  />
+  <!-- DataTables CSS -->
+  <link
+    href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"
+    rel="stylesheet"
+  />
+  <link
+    href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --dark-bg: #121212;
+      --dark-secondary: #1e1e2e;
+      --dark-tertiary: #2d2d42;
+      --text-light: #e0e0e0;
+      --text-muted: #adb5bd;
+      --primary-red: #dc3545;
+      --success-green: #28a745;
+      --warning-yellow: #ffc107;
+    }
+    body {
+      background: var(--dark-bg);
+      color: var(--text-light);
+    }
+    .nav-tabs {
+      background: var(--dark-secondary);
+      border-bottom: 1px solid #454d55;
+    }
+    .nav-tabs .nav-link {
+      color: var(--text-muted);
+      background: var(--dark-secondary);
+    }
+    .nav-tabs .nav-link.active {
+      background: var(--primary-red);
+      color: #fff;
+    }
+    .container {
+      max-width: 1200px;
+    }
+    .table {
+      margin-top: 1rem;
+    }
+    .table-striped tbody tr:nth-of-type(odd) {
+      background: var(--dark-secondary) !important;
+    }
+    .table-striped tbody tr:nth-of-type(even) {
+      background: var(--dark-tertiary) !important;
+    }
+    .table thead th {
+      background: var(--dark-tertiary);
+      color: #fff;
+      border-color: #454d55;
+    }
+    .table tbody td {
+      color: var(--text-light);
+      background: transparent;
+    }
+    .form-control,
+    .form-select {
+      background: var(--dark-tertiary);
+      color: var(--text-light);
+      border: 1px solid #454d55;
+    }
+    .form-control::placeholder {
+      color: var(--text-muted);
+    }
+    .form-control:focus,
+    .form-select:focus {
+      border-color: var(--primary-red);
+      box-shadow: none;
+    }
+    .modal-content {
+      background: var(--dark-secondary);
+      color: var(--text-light);
+    }
+    .modal-header,
+    .modal-footer {
+      border-color: #454d55;
+    }
+    .btn-close {
+      filter: invert(1);
+    }
+    .btn-primary {
+      background: var(--primary-red);
+      border-color: var(--primary-red);
+    }
+    .btn-primary:hover {
+      background: #e55550;
+      border-color: #e55550;
+    }
+    .btn-secondary {
+      background: #454d55;
+      border-color: #454d55;
+    }
+    .btn-info {
+      background: #17a2b8;
+      border-color: #17a2b8;
+      color: #fff;
+    }
+    .btn-success {
+      background: var(--success-green);
+      border-color: var(--success-green);
+      color: #fff;
+    }
+    .btn-warning {
+      background: var(--warning-yellow);
+      border-color: var(--warning-yellow);
+      color: #000;
+    }
+    .dt-button.btn-primary {
+      color: #fff !important;
+      background: var(--primary-red) !important;
+      border-color: var(--primary-red) !important;
+      margin-right: .5rem;
+    }
+    .dataTables_filter input {
+      background: var(--dark-tertiary) !important;
+      color: var(--text-light) !important;
+      border: 1px solid #454d55 !important;
+    }
+    .dataTables_filter input::placeholder {
+      color: var(--text-muted) !important;
+    }
+    .pac-container {
+      z-index: 2000 !important;
+    }
+    #addMap,
+    #editMap,
+    #vendorMap {
+      width: 100%;
+      height: 300px;
+      margin-top: .5rem;
+      border: 1px solid #454d55;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container mt-4">
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <a class="nav-link active" href="#">Vendedores</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Turnos</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Promociones</a>
+      </li>
+    </ul>
+
+    <!-- Header and Add Button -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <h2><i class="fas fa-user-cog me-2"></i>Administración de Vendedores</h2>
+      <button
+        class="btn btn-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#addSellerModal"
+      >
+        <i class="fas fa-user-plus me-1"></i>Agregar Vendedor
+      </button>
+    </div>
+
+    <!-- Sellers Table -->
+    <table id="vendedores-table" class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Apellido</th>
+          <th>Edad</th>
+          <th>Fecha Nac</th>
+          <th>DNI</th>
+          <th>Email</th>
+          <th>Celular</th>
+          <th>Dirección</th>
+          <th>Región</th>
+          <th>Ciudad</th>
+          <th>Métricas</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Modal: Agregar Vendedor -->
+  <div class="modal fade" id="addSellerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <form id="addSellerForm">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="fas fa-user-plus me-1"></i>Agregar Vendedor
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="row gy-3">
+              <div class="col-md-6">
+                <label class="form-label">Nombre</label>
+                <input
+                  type="text"
+                  id="addNombre"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Apellido</label>
+                <input
+                  type="text"
+                  id="addApellido"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Edad</label>
+                <input
+                  type="number"
+                  id="addEdad"
+                  class="form-control"
+                  min="18"
+                  max="65"
+                  required
+                />
+              </div>
+              <div class="col-md-8">
+                <label class="form-label">Fecha de Nacimiento</label>
+                <input
+                  type="date"
+                  id="addFechaNac"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">DNI</label>
+                <input
+                  type="text"
+                  id="addDni"
+                  class="form-control"
+                  pattern="\d{7,10}"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input
+                  type="email"
+                  id="addEmail"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Celular</label>
+                <input
+                  type="tel"
+                  id="addCelular"
+                  class="form-control"
+                  pattern="\d{7,15}"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Región</label>
+                <input
+                  type="text"
+                  id="addRegion"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Ciudad</label>
+                <input
+                  type="text"
+                  id="addCiudad"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="col-md-12">
+                <label class="form-label">Dirección</label>
+                <input
+                  type="text"
+                  id="addDireccion"
+                  class="form-control"
+                  placeholder="Escribe la dirección..."
+                  required
+                />
+              </div>
+              <div class="col-md-12">
+                <div id="addMap"></div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Editar Vendedor -->
+  <div class="modal fade" id="editSellerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <form id="editSellerForm">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="fas fa-edit me-1"></i>Editar Vendedor
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="editId" />
+            <input type="hidden" id="editLat" />
+            <input type="hidden" id="editLng" />
+            <div class="row gy-3">
+              <div class="col-md-6">
+                <label class="form-label">Nombre</label>
+                <input
+                  type="text"
+                  id="editNombre"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Apellido</label>
+                <input
+                  type="text"
+                  id="editApellido"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Edad</label>
+                <input
+                  type="number"
+                  id="editEdad"
+                  class="form-control"
+                  min="18"
+                  max="65"
+                  required
+                />
+              </div>
+              <div class="col-md-8">
+                <label class="form-label">Fecha de Nacimiento</label>
+                <input
+                  type="date"
+                  id="editFechaNac"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">DNI</label>
+                <input
+                  type="text"
+                  id="editDni"
+                  class="form-control"
+                  pattern="\d{7,10}"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input
+                  type="email"
+                  id="editEmail"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Celular</label>
+                <input
+                  type="tel"
+                  id="editCelular"
+                  class="form-control"
+                  pattern="\d{7,15}"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Región</label>
+                <input
+                  type="text"
+                  id="editRegion"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Ciudad</label>
+                <input
+                  type="text"
+                  id="editCiudad"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="col-md-12">
+                <label class="form-label">Dirección</label>
+                <input
+                  type="text"
+                  id="editDireccion"
+                  class="form-control"
+                  placeholder="Escribe la dirección..."
+                  required
+                />
+              </div>
+              <div class="col-md-12">
+                <div id="editMap"></div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary">Actualizar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Ubicación Vendedor -->
+  <div class="modal fade" id="vendorMapModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="fas fa-map-marker-alt me-1"></i>Ubicación del Vendedor
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div id="vendorMap"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Métricas -->
+  <div class="modal fade" id="metricsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="fas fa-chart-line me-1"></i>Métricas del Vendedor
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <ul class="nav nav-tabs" id="metricsTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link active"
+                id="sales-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#sales"
+                type="button"
+              >
+                Casas Vendidas
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="inquiries-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#inquiries"
+                type="button"
+              >
+                Consultas
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="closed-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#closed"
+                type="button"
+              >
+                Concretadas
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="lost-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#lost"
+                type="button"
+              >
+                No Concretadas
+              </button>
+            </li>
+          </ul>
+          <div class="tab-content pt-3">
+            <div class="tab-pane fade show active" id="sales" role="tabpanel">
+              <canvas id="chartSales"></canvas>
+            </div>
+            <div class="tab-pane fade" id="inquiries" role="tabpanel">
+              <canvas id="chartInquiries"></canvas>
+            </div>
+            <div class="tab-pane fade" id="closed" role="tabpanel">
+              <canvas id="chartClosed"></canvas>
+            </div>
+            <div class="tab-pane fade" id="lost" role="tabpanel">
+              <canvas id="chartLost"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script
+    src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"
+  ></script>
+  <script
+    src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"
+  ></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+  ></script>
+  <script
+    src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+  ></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB-C_IPlrBJMHXeSILeOjnyTqd2-jVKRig&libraries=places&callback=initAllMaps"
+  ></script>
+
+  <script>
+    const STORAGE_KEY = 'vendedoresSion';
+    let vendedores = [];
+    let dt;
+    let addMap, addMarker, addAutocomplete;
+    let editMap, editMarker, editAutocomplete;
+    let currentAddLat, currentAddLng, currentAddAddress;
+    let chartSales, chartInquiries, chartClosed, chartLost;
+
+    function initAllMaps() {
+      const center = { lat: -34.6037, lng: -58.3816 };
+
+      // ADD MAP
+      addMap = new google.maps.Map(
+        document.getElementById('addMap'),
+        { center, zoom: 5 }
+      );
+      addMarker = new google.maps.Marker({
+        map: addMap,
+        draggable: true
+      });
+      addMarker.addListener('dragend', () => {
+        const p = addMarker.getPosition();
+        currentAddLat = p.lat();
+        currentAddLng = p.lng();
+      });
+      addAutocomplete = new google.maps.places.Autocomplete(
+        document.getElementById('addDireccion'),
+        { types: ['address'], componentRestrictions: { country: 'ar' } }
+      );
+      addAutocomplete.bindTo('bounds', addMap);
+      addAutocomplete.addListener('place_changed', () => {
+        const place = addAutocomplete.getPlace();
+        if (!place.geometry) return;
+        currentAddAddress = place.formatted_address;
+        const loc = place.geometry.location;
+        currentAddLat = loc.lat();
+        currentAddLng = loc.lng();
+        addMap.fitBounds(
+          place.geometry.viewport || {
+            north: loc.lat(),
+            south: loc.lat(),
+            east: loc.lng(),
+            west: loc.lng()
+          }
+        );
+        addMap.setZoom(15);
+        addMarker.setPosition(loc);
+      });
+
+      // EDIT MAP
+      editMap = new google.maps.Map(
+        document.getElementById('editMap'),
+        { center, zoom: 5 }
+      );
+      editMarker = new google.maps.Marker({
+        map: editMap,
+        draggable: true
+      });
+      editMarker.addListener('dragend', () => {
+        const p = editMarker.getPosition();
+        $('#editLat').val(p.lat());
+        $('#editLng').val(p.lng());
+      });
+      editAutocomplete = new google.maps.places.Autocomplete(
+        document.getElementById('editDireccion'),
+        { types: ['address'], componentRestrictions: { country: 'ar' } }
+      );
+      editAutocomplete.bindTo('bounds', editMap);
+      editAutocomplete.addListener('place_changed', () => {
+        const place = editAutocomplete.getPlace();
+        if (!place.geometry) return;
+        $('#editDireccion').val(place.formatted_address);
+        const loc = place.geometry.location;
+        $('#editLat').val(loc.lat());
+        $('#editLng').val(loc.lng());
+        editMap.fitBounds(
+          place.geometry.viewport || {
+            north: loc.lat(),
+            south: loc.lat(),
+            east: loc.lng(),
+            west: loc.lng()
+          }
+        );
+        editMap.setZoom(15);
+        editMarker.setPosition(loc);
+      });
+    }
+
+    function loadSellers() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      vendedores = stored ? JSON.parse(stored) : [];
+    }
+    function saveSellers() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(vendedores));
+    }
+
+    function initDataTable() {
+      dt = $('#vendedores-table').DataTable({
+        dom: 'Bfrtip',
+        buttons: [
+          {
+            extend: 'excelHtml5',
+            text:
+              '<i class="fas fa-file-excel me-1"></i>Exportar a Excel',
+            className: 'dt-button btn btn-primary btn-sm'
+          }
+        ],
+        language: {
+          url:
+            '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
+        },
+        columnDefs: [
+          { orderable: false, targets: [11, 12] }
+        ]
+      });
+    }
+
+    function setMaxDate() {
+      const today = new Date().toISOString().split('T')[0];
+      $('#addFechaNac,#editFechaNac').attr('max', today);
+    }
+
+    function renderTable() {
+      const rows = vendedores.map(v => [
+        v.id || '',
+        v.nombre || '',
+        v.apellido || '',
+        v.edad || '',
+        v.fechaNac || '',
+        v.dni || '',
+        v.email || '',
+        v.celular || '',
+        v.address || '',
+        v.region || '',
+        v.ciudad || '',
+        `<button class="btn btn-sm btn-info metrics-btn me-1" data-id="${v.id}">
+           <i class="fas fa-chart-line"></i>
+         </button>
+         <a href="https://wa.me/${v.celular}" target="_blank"
+           class="btn btn-sm btn-success whatsapp-btn me-1">
+           <i class="fab fa-whatsapp"></i>
+         </a>
+         <button class="btn btn-sm btn-light map-btn" data-lat="${v.lat}"
+           data-lng="${v.lng}" data-address="${encodeURIComponent(
+             v.address || ''
+           )}">
+           <i class="fas fa-map-marker-alt"></i>
+         </button>`,
+        `<button class="btn btn-sm btn-light edit-btn me-1" data-id="${
+          v.id
+        }">
+           <i class="fas fa-edit"></i>
+         </button>
+         <button class="btn btn-sm btn-danger delete-btn" data-id="${
+           v.id
+         }"><i class="fas fa-trash-alt"></i></button>`
+      ]);
+      dt.clear().rows.add(rows).draw();
+      attachRowEvents();
+    }
+
+    function attachRowEvents() {
+      // Eliminar
+      $('#vendedores-table tbody')
+        .off('click', '.delete-btn')
+        .on('click', '.delete-btn', function () {
+          if (confirm('¿Eliminar este vendedor?')) {
+            const id = $(this).data('id').toString();
+            vendedores = vendedores.filter(v => v.id !== id);
+            saveSellers();
+            renderTable();
+          }
+        });
+
+      // Editar
+      $('#vendedores-table tbody')
+        .off('click', '.edit-btn')
+        .on('click', '.edit-btn', function () {
+          const id = $(this).data('id').toString();
+          const v = vendedores.find(x => x.id === id);
+          $('#editId').val(v.id);
+          $('#editNombre').val(v.nombre);
+          $('#editApellido').val(v.apellido);
+          $('#editEdad').val(v.edad);
+          $('#editFechaNac').val(v.fechaNac);
+          $('#editDni').val(v.dni);
+          $('#editEmail').val(v.email);
+          $('#editCelular').val(v.celular);
+          $('#editRegion').val(v.region);
+          $('#editCiudad').val(v.ciudad);
+          $('#editDireccion').val(v.address);
+          $('#editLat').val(v.lat);
+          $('#editLng').val(v.lng);
+          const pos = { lat: parseFloat(v.lat), lng: parseFloat(v.lng) };
+          editMap.setCenter(pos);
+          editMap.setZoom(15);
+          editMarker.setPosition(pos);
+          new bootstrap.Modal($('#editSellerModal')).show();
+        });
+
+      // Ver Mapa
+      $('#vendedores-table tbody')
+        .off('click', '.map-btn')
+        .on('click', '.map-btn', function () {
+          const lat = parseFloat($(this).data('lat'));
+          const lng = parseFloat($(this).data('lng'));
+          const addr = decodeURIComponent(
+            $(this).data('address')
+          );
+          $('#vendorMapModal')
+            .off('shown.bs.modal')
+            .on('shown.bs.modal', () => {
+              const m = new google.maps.Map(
+                document.getElementById('vendorMap'),
+                { center: { lat, lng }, zoom: 15 }
+              );
+              new google.maps.Marker({
+                position: { lat, lng },
+                map: m,
+                title: addr
+              });
+            });
+          new bootstrap.Modal($('#vendorMapModal')).show();
+        });
+
+      // Métricas
+      $('#vendedores-table tbody')
+        .off('click', '.metrics-btn')
+        .on('click', '.metrics-btn', function () {
+          const id = $(this).data('id').toString();
+          const v = vendedores.find(x => x.id === id);
+
+          // Labels últimos 12 meses
+          const labels = [];
+          for (let i = 11; i >= 0; i--) {
+            const d = new Date();
+            d.setMonth(d.getMonth() - i);
+            labels.push(
+              d.toLocaleString('es-AR', {
+                month: 'short',
+                year: '2-digit'
+              })
+            );
+          }
+
+          // Destruir gráficos previos
+          [chartSales, chartInquiries, chartClosed, chartLost].forEach(
+            c => c && c.destroy()
+          );
+
+          // Dibujar cada gráfico
+          const cfg = (ctx, label, data, color) =>
+            new Chart(ctx, {
+              type: 'line',
+              data: { labels, datasets: [{ label, data, borderColor: color, tension: 0.3, fill: false }] },
+              options: { scales: { y: { beginAtZero: true } } }
+            });
+
+          chartSales = cfg(
+            $('#chartSales')[0].getContext('2d'),
+            'Casas Vendidas',
+            v.metrics.sales,
+            '#dc3545'
+          );
+          chartInquiries = cfg(
+            $('#chartInquiries')[0].getContext('2d'),
+            'Consultas',
+            v.metrics.inquiries,
+            '#17a2b8'
+          );
+          chartClosed = cfg(
+            $('#chartClosed')[0].getContext('2d'),
+            'Concretadas',
+            v.metrics.closed,
+            '#28a745'
+          );
+          chartLost = cfg(
+            $('#chartLost')[0].getContext('2d'),
+            'No Concretadas',
+            v.metrics.lost,
+            '#ffc107'
+          );
+
+          new bootstrap.Modal($('#metricsModal')).show();
+        });
+    }
+
+    $(document).ready(() => {
+      setMaxDate();
+      initDataTable();
+      loadSellers();
+      renderTable();
+
+      // Agregar vendedor
+      $('#addSellerForm').on('submit', function (e) {
+        e.preventDefault();
+        if (!currentAddLat || !currentAddLng) {
+          alert('Seleccione una dirección válida en el mapa.');
+          return;
+        }
+        // Generar métricas iniciales (ceros)
+        const zeroArr = Array(12).fill(0);
+        const nuevo = {
+          id: Date.now().toString(),
+          nombre: $('#addNombre').val().trim(),
+          apellido: $('#addApellido').val().trim(),
+          edad: parseInt($('#addEdad').val(), 10),
+          fechaNac: $('#addFechaNac').val(),
+          dni: $('#addDni').val().trim(),
+          email: $('#addEmail').val().trim(),
+          celular: $('#addCelular').val().trim(),
+          address: currentAddAddress,
+          region: $('#addRegion').val().trim(),
+          ciudad: $('#addCiudad').val().trim(),
+          lat: currentAddLat,
+          lng: currentAddLng,
+          metrics: {
+            sales: [...zeroArr],
+            inquiries: [...zeroArr],
+            closed: [...zeroArr],
+            lost: [...zeroArr]
+          }
+        };
+        vendedores.push(nuevo);
+        saveSellers();
+        renderTable();
+        this.reset();
+        addMap.setCenter({ lat: -34.6037, lng: -58.3816 });
+        addMap.setZoom(5);
+        addMarker.setPosition(null);
+        currentAddLat = currentAddLng = currentAddAddress = null;
+        bootstrap.Modal.getInstance($('#addSellerModal')).hide();
+      });
+
+      // Editar vendedor
+      $('#editSellerForm').on('submit', function (e) {
+        e.preventDefault();
+        const id = $('#editId').val();
+        const idx = vendedores.findIndex(v => v.id === id);
+        vendedores[idx] = {
+          ...vendedores[idx],
+          nombre: $('#editNombre').val().trim(),
+          apellido: $('#editApellido').val().trim(),
+          edad: parseInt($('#editEdad').val(), 10),
+          fechaNac: $('#editFechaNac').val(),
+          dni: $('#editDni').val().trim(),
+          email: $('#editEmail').val().trim(),
+          celular: $('#editCelular').val().trim(),
+          address: $('#editDireccion').val().trim(),
+          region: $('#editRegion').val().trim(),
+          ciudad: $('#editCiudad').val().trim(),
+          lat: parseFloat($('#editLat').val()),
+          lng: parseFloat($('#editLng').val())
+        };
+        saveSellers();
+        renderTable();
+        this.reset();
+        bootstrap.Modal.getInstance($('#editSellerModal')).hide();
+      });
+    });
+  </script>
+</body>
+</html>

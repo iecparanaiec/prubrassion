@@ -1,0 +1,255 @@
+/* ===========================
+   ESTILO CRM VIVIENDAS SION
+   =========================== */
+
+   @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap");
+
+   :root {
+     --primary-color: #e71b1b;     /* rojo institucional */
+     --accent-color: #6b2aff;      /* violeta oscuro */
+     --bg-color: #222121;
+     --bg-secondary: #2e2e2e;
+     --text-color: #f1f1f1;
+   }
+   
+   *,
+   *::before,
+   *::after {
+     box-sizing: border-box;
+   }
+   
+   body {
+     font-family: "Inter", sans-serif;
+     background: var(--bg-color);
+     color: var(--text-color);
+     min-height: 100vh;
+   }
+   
+   h1,
+   h2,
+   h3,
+   h4,
+   h5 {
+     color: var(--primary-color);
+   }
+   
+   a {
+     color: var(--accent-color);
+   }
+   
+   table {
+     background: var(--bg-secondary);
+     color: var(--text-color);
+   }
+   
+   thead {
+     background: var(--accent-color);
+   }
+   
+   th,
+   td {
+     vertical-align: middle !important;
+   }
+   
+   .nav-pills .nav-link {
+     background: var(--bg-secondary);
+     color: var(--text-color);
+     margin-right: 0.5rem;
+   }
+   
+   .nav-pills .nav-link.active {
+     background: var(--accent-color);
+     color: #fff;
+   }
+   
+   .btn-primary {
+     background: var(--primary-color);
+     border-color: var(--primary-color);
+   }
+   
+   .btn-success {
+     background: #28a745;
+     border: none;
+   }
+   
+   .modal-content {
+     border: 2px solid var(--accent-color);
+   }
+   
+   input[type="file"]::file-selector-button {
+     background: var(--accent-color);
+     color: #fff;
+     border: none;
+     padding: 0.4rem 1rem;
+     border-radius: 4px;
+     cursor: pointer;
+   }
+   
+   input[type="file"]::file-selector-button:hover {
+     opacity: 0.85;
+   }
+   
+   tr.vencido > td {
+     background: rgba(231, 27, 27, 0.25);
+   }
+   /* =========================================================
+   CLIENTES – Ajustes visuales específicos (suma al styles.css)
+   ========================================================= */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap");
+
+:root {
+  --primary-color: #e71b1b;
+  --accent-color: #6b2aff;
+  --bg-color: #222121;
+  --bg-secondary: #2e2e2e;
+  --text-color: #f1f1f1;
+}
+
+body { font-family: "Inter", sans-serif; }
+
+.titulo-seccion { color: var(--primary-color); }
+
+.topbar {
+  height: 56px;
+  background: var(--primary-color);
+}
+
+#sidebar-wrapper {
+  background: #1b1b1b;
+  min-width: 200px;
+}
+
+#sidebar-wrapper .list-group-item {
+  background: transparent;
+  color: #ddd;
+  border: 0;
+}
+
+#sidebar-wrapper .list-group-item.active,
+#sidebar-wrapper .list-group-item:hover {
+  background: var(--primary-color);
+  color: #fff;
+}
+
+#searchInput::placeholder { color: #999; }
+
+.nav-pills .nav-link   { background: var(--bg-secondary); color: #ddd; }
+.nav-pills .nav-link.active { background: var(--accent-color); color: #fff; }
+
+.card-cliente {
+  background: var(--bg-secondary);
+  color: var(--text-color);
+  border: 1px solid #444;
+}
+
+.card-cliente:hover { border-color: var(--accent-color); }
+
+#fabAdd {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  width: 52px; height: 52px;
+  display: flex; justify-content: center; align-items: center;
+  z-index: 1000;
+}
+
+/* Vista tabla */
+table thead { background: var(--accent-color); color: #fff; }
+table tbody tr:hover { background: rgba(107, 42, 255, 0.15); }
+
+/* Resaltar hoja “vencidos” */
+tr.vencido > td { background: rgba(231, 27, 27, 0.25); }
+/* Paleta y tipografía (mismos tokens que tu CRM) */
+:root {
+    --primary-color:#e71b1b;
+    --accent-color:#6b2aff;
+    --bg-color:#222121;
+    --bg-secondary:#2e2e2e;
+    --text-color:#f1f1f1;
+  }
+  
+  body            {background:var(--bg-color); font-family:Inter, sans-serif;}
+  .topbar         {height:54px; background:var(--primary-color);}
+  .nav-pills .nav-link      {background:var(--bg-secondary); color:#ddd;}
+  .nav-pills .nav-link.active{background:var(--accent-color); color:#fff;}
+  
+  .card-cliente   {background:var(--bg-secondary); border:1px solid #444; color:var(--text-color);}
+  .card-cliente:hover{border-color:var(--accent-color);}
+  
+  table thead     {background:var(--accent-color); color:#fff;}
+  tr.vencido>td   {background:rgba(231,27,27,.25);}
+  :root{
+    --primary-color:#e71b1b;
+    --accent-color:#6b2aff;
+    --bg-color:#222121;
+    --bg-secondary:#2e2e2e;
+    --text-color:#f1f1f1;
+  }
+  
+  body            {background:var(--bg-color); font-family:Inter, sans-serif;}
+  .topbar         {height:54px; background:var(--primary-color);}
+  .nav-pills .nav-link       {background:var(--bg-secondary); color:#ccc;}
+  .nav-pills .nav-link.active{background:var(--accent-color); color:#fff;}
+  
+  .card-cliente   {background:var(--bg-secondary);
+                   border:1px solid #444; color:var(--text-color);}
+  .card-cliente:hover{border-color:var(--accent-color);}
+  
+  table thead     {background:var(--accent-color); color:#fff;}
+  tr.vencido>td   {background:rgba(231,27,27,.25);}
+  :root{
+    --primary-color:#e71b1b;
+    --accent-color:#6b2aff;
+    --bg-color:#222121;
+    --bg-secondary:#2e2e2e;
+    --text-color:#f1f1f1;
+  }
+  
+  body            {background:var(--bg-color); font-family:Inter, sans-serif;}
+  .topbar         {height:54px; background:var(--primary-color);}
+  .nav-pills .nav-link       {background:var(--bg-secondary); color:#ccc;}
+  .nav-pills .nav-link.active{background:var(--accent-color); color:#fff;}
+  
+  table thead     {background:var(--accent-color); color:#fff;}
+  table td, table th {white-space:nowrap;}
+  .content-table  {max-width:100%; overflow:auto;}
+  
+  td[contenteditable="true"]:focus{outline:2px solid var(--accent-color);}
+  :root{
+    --primary-color:#e71b1b;
+    --accent-color:#6b2aff;
+    --bg-color:#222121;
+    --bg-secondary:#2e2e2e;
+    --text-color:#f1f1f1;
+  }
+  
+  body            {background:var(--bg-color); font-family:Inter, sans-serif;}
+  .topbar         {height:54px; background:var(--primary-color);}
+  .nav-pills .nav-link       {background:var(--bg-secondary); color:#ccc;}
+  .nav-pills .nav-link.active{background:var(--accent-color); color:#fff;}
+  
+  .tabulator      {border:1px solid #444;}
+  .tabulator .tabulator-header{background:var(--accent-color);}
+  .tabulator .tabulator-col,
+  .tabulator .tabulator-cell{color:var(--text-color); font-size:.875rem;}
+        
+  :root{
+    --primary:#e71b1b;
+    --accent:#6b2aff;
+    --bg:#222121;
+    --bg-sec:#2e2e2e;
+    --txt:#f1f1f1;
+  }
+  
+  /* Barra roja */
+  .topbar{height:54px;background:var(--primary);}
+  body{background:var(--bg);font-family:Inter, sans-serif;}
+  
+  .nav-pills .nav-link{background:var(--bg-sec);color:#ccc;}
+  .nav-pills .nav-link.active{background:var(--accent);color:#fff;}
+  
+  .tabulator{border:1px solid #444;}
+  .tabulator .tabulator-header{background:var(--accent);}
+  .tabulator .tabulator-col,
+  .tabulator .tabulator-cell{font-size:.85rem;color:var(--txt);}
+  

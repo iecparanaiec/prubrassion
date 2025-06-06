@@ -1,0 +1,389 @@
+/****************************************************
+ * VARIABLES Y PALETA DE COLORES
+ ****************************************************/
+ :root {
+  --color-bg: #1a1a1a;          /* Fondo principal oscuro */
+  --color-board: #242424;       /* Fondo del tablero */
+  --color-text: #f0f0f0;        /* Texto claro */
+  --color-accent: #ff9100;      /* Color acento */
+  --color-note-bg: rgba(255,255,255,0.05);
+  --color-note-border: rgba(255,255,255,0.15);
+  --color-toolbar-bg: rgba(255,255,255,0.08);
+  --color-toolbar-border: rgba(255,255,255,0.2);
+  --color-header-bg: #111;      /* Encabezado de la página */
+  --color-header-text: #f0f0f0;
+  --color-shadow: rgba(0,0,0,0.5);
+  --radius-note: 10px;
+  --toolbar-btn-bg: #666;
+  --toolbar-btn-hover: #888;
+}
+
+/****************************************************
+ * RESETEO BÁSICO
+ ****************************************************/
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+/****************************************************
+ * ESTILOS GENERALES
+ ****************************************************/
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  overflow: hidden;
+}
+
+/****************************************************
+ * ENCABEZADO
+ ****************************************************/
+.header {
+  padding: 10px;
+  background-color: var(--color-header-bg);
+  color: var(--color-header-text);
+  display: flex;
+  align-items: center;
+  height: 60px;
+  box-shadow: 0 2px 4px var(--color-shadow);
+}
+
+.header h1 {
+  font-size: 1.2rem;
+  font-weight: 400;
+  margin-left: 10px;
+}
+
+/****************************************************
+ * TABLERO (BOARD)
+ ****************************************************/
+.board {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 60px);
+  background-color: var(--color-board);
+  overflow: auto;
+  padding: 10px;
+}
+
+/****************************************************
+ * BOTÓN FLOTANTE (para agregar notas)
+ ****************************************************/
+.floating-btn {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 50px;
+  height: 50px;
+  background-color: var(--color-accent);
+  color: #222; /* Contraste con el acento */
+  border: none;
+  border-radius: 50%;
+  font-size: 2rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 6px var(--color-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+.floating-btn:hover {
+  transform: scale(1.1);
+}
+
+/****************************************************
+ * NOTAS
+ ****************************************************/
+.note {
+  position: absolute;
+  width: 220px;
+  min-height: 120px;
+  background: var(--color-note-bg);
+  border: 1px solid var(--color-note-border);
+  box-shadow: 2px 2px 6px var(--color-shadow);
+  display: flex;
+  flex-direction: column;
+  resize: both;
+  overflow: auto;
+  cursor: default;
+  border-radius: var(--radius-note);
+  transition: box-shadow 0.2s;
+}
+.note:hover {
+  box-shadow: 2px 2px 12px var(--color-shadow);
+}
+
+/* Encabezado de la nota */
+.note-header {
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.05);
+  padding: 4px 8px;
+  cursor: move;  
+  user-select: none;
+  border-top-left-radius: var(--radius-note);
+  border-top-right-radius: var(--radius-note);
+}
+
+/****************************************************
+ * ÍCONOS DEL ENCABEZADO (lápiz, campana, papelera)
+ ****************************************************/
+.header-icons {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+/* Íconos un poco más grandes */
+.header-icons button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  color: #666;
+  transition: color 0.2s;
+}
+.header-icons button:hover {
+  color: #ccc;
+}
+
+/****************************************************
+ * BARRA DE HERRAMIENTAS DE FORMATO (por defecto oculta)
+ ****************************************************/
+.formatting-toolbar {
+  display: none;
+  background: var(--color-toolbar-bg);
+  border: 1px solid var(--color-toolbar-border);
+  padding: 4px;
+  margin: 4px;
+  font-size: 14px;
+  border-radius: 6px;
+  gap: 4px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* Botones de la toolbar */
+.formatting-toolbar button {
+  background: var(--toolbar-btn-bg);
+  color: #fff;
+  border: 1px solid #777;
+  border-radius: 3px;
+  cursor: pointer;
+  padding: 2px 6px;
+  margin: 0;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+.formatting-toolbar button:hover {
+  background: var(--toolbar-btn-hover);
+}
+
+/* Select, inputs color, datetime */
+.formatting-toolbar select,
+.formatting-toolbar input[type="color"],
+.formatting-toolbar input[type="datetime-local"] {
+  border: 1px solid #777;
+  border-radius: 3px;
+  background: #555;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px;
+  margin-right: 4px;
+}
+
+/****************************************************
+ * CONTENEDOR DE EMOJIS / ICONOS
+ ****************************************************/
+.emoji-panel {
+  display: none;          /* Oculto por defecto, se muestra al pulsar el botón */
+  background: #555;
+  border: 1px solid #777;
+  border-radius: 4px;
+  padding: 4px;
+  gap: 4px;
+  position: absolute;     /* Relativo al contenedor .formatting-toolbar */
+  top: 40px;              /* Para que aparezca debajo del botón */
+  left: 0;
+  flex-wrap: wrap;
+}
+
+.emoji-panel button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  margin: 2px;
+}
+.emoji-panel button:hover {
+  background: #666;
+  border-radius: 4px;
+}
+
+/****************************************************
+ * INTERRUPTOR (toggle) para la alarma
+ ****************************************************/
+.toggle-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 6px;
+}
+.toggle-container label {
+  font-size: 0.8rem;
+  color: #ccc;
+}
+
+/* Estilo switch minimalista para el checkbox */
+.toggle-container input[type="checkbox"] {
+  width: 36px;
+  height: 20px;
+  appearance: none;
+  background: #666;
+  outline: none;
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.toggle-container input[type="checkbox"]::before {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: 0.2s;
+}
+.toggle-container input[type="checkbox"]:checked {
+  background: var(--color-accent);
+}
+.toggle-container input[type="checkbox"]:checked::before {
+  transform: translateX(16px);
+}
+
+/****************************************************
+ * CONTENIDO EDITABLE DE LA NOTA
+ ****************************************************/
+.note-content {
+  flex: 1;
+  padding: 8px;
+  outline: none;
+  overflow: auto;
+  font-size: 14px;
+  color: var(--color-text);
+  cursor: text;
+}
+.note-content:empty::before {
+  content: "Escribe aquí...";
+  color: #aaa;
+}
+
+/****************************************************
+ * MODO EDICIÓN (cuando se hace clic en el lápiz)
+ ****************************************************/
+.note.edit-mode {
+  background-color: #2c2c2c; 
+}
+
+.note.edit-mode .formatting-toolbar {
+  display: flex !important;
+  background-color: #3b3b3b;
+  border: 1px solid #555;
+}
+
+/* Ajuste general para que las imágenes no desborden */
+.note-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/****************************************************
+ * NUEVA REGLA: IMAGE WRAPPER
+ * Para que el texto fluya a la derecha (u alrededor) de la imagen
+ ****************************************************/
+ .image-wrapper {
+  float: left;         /* O right, si prefieres la imagen flotando a la derecha */
+  position: relative;  /* Necesario para que el botón X (absolute) se posicione en este contenedor */
+  display: inline-block;
+  margin: 5px;
+}
+
+.image-wrapper img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+
+/****************************************************
+ * CONTENEDOR "resizable-image" que envuelve la imagen
+ ****************************************************/
+.resizable-image {
+  position: relative;
+  display: inline-block; /* Permite que el contenedor se alinee en línea con texto */
+}
+
+/* La imagen dentro del contenedor */
+.resizable-image img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* Manejador (handle) en la esquina inferior derecha */
+.resize-handle {
+  position: absolute;
+  width: 16px; 
+  height: 16px;
+  right: 0; 
+  bottom: 0;
+  background: #fff;
+  border: 1px solid #666;
+  border-radius: 4px;
+  cursor: nwse-resize;
+}
+
+/* Opcional: un efecto visual al pasar el mouse sobre el handle */
+.resize-handle:hover {
+  background: #ddd;
+}
+.modal-overlay {
+  position: fixed;
+  top:0; left:0; right:0; bottom:0;
+  background: rgba(0,0,0,0.5);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:10000;
+}
+.modal {
+  background:#2c2c2c;
+  padding:20px;
+  border-radius:8px;
+  max-width:400px;
+  width:90%;
+  box-shadow:0 2px 10px rgba(0,0,0,0.2);
+}
+.modal h3 {
+  margin-top:0;
+}
+.modal-close {
+  margin-top:10px;
+  padding:6px 12px;
+  background:#007bff;
+  border:none;
+  color:#fff;
+  border-radius:4px;
+  cursor:pointer;
+}

@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Compras – Viviendas Sion</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- jsPDF + AutoTable -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+  <style>
+    :root{
+      --red:#e71b1b;--dark:#1b1b1b;--mid:#2b2b2b;
+      --light:#f0f0f0;--gray:#6c757d;
+    }
+    body{
+      background:var(--dark);color:var(--light);
+      font-family:Arial,sans-serif;margin:0;padding:1rem;
+    }
+    h2,h4{color:var(--red);margin-top:1rem}
+    .form-label{color:var(--light)}
+    .form-control,.form-select{
+      background:var(--mid);color:var(--light);
+      border:1px solid var(--gray);
+    }
+    .btn-red{background:var(--red);color:#fff}
+    .btn-gray{background:var(--gray);color:#fff}
+    .btn-close-white{filter:invert(1)}
+    .table-dark th,.table-dark td{border-color:var(--gray)}
+    .list-group-item{
+      background:var(--mid);color:var(--light);border:none;
+    }
+    .list-group-item+.list-group-item{
+      border-top:1px solid var(--gray);
+    }
+    .star-button,.action-btn{
+      background:transparent;border:none;color:var(--light);
+      font-size:1.2rem;cursor:pointer;margin-right:.5rem;
+    }
+    .star-button.favorito{color:gold}
+    .action-btn:hover{color:var(--red)}
+  </style>
+</head>
+<body>
+
+<div class="container-fluid">
+  <h2>Compras</h2>
+
+  <!-- ===================== PESTAÑAS ===================== -->
+  <ul class="nav nav-tabs" id="comprasTabs">
+    <li class="nav-item">
+      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#historialCalculos">
+        Historial de Cálculos
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#compras">
+        Compras
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#proveedores">
+        Proveedores
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content pt-3">
+
+  <!-- ============ HISTORIAL DE CÁLCULOS ============ -->
+  <div class="tab-pane fade show active" id="historialCalculos">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4>Historial de Cálculos</h4>
+      <button id="loadPricesBtn" class="btn btn-gray">
+        <i class="fas fa-tag me-1"></i>Cargar Precios
+      </button>
+    </div>
+
+    <ul id="historyList" class="list-group mb-4"></ul>
+
+    <!-- ========== MODAL DETALLE COMPRA (cálculos) ========== -->
+    <div class="modal fade" id="purchaseModal" tabindex="-1">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content bg-dark text-light">
+          <div class="modal-header">
+            <h5 class="modal-title">Compra para <span id="purchaseClient"></span></h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <table class="table table-dark mb-3">
+              <thead>
+                <tr>
+                  <th>Material</th><th>Cantidad</th>
+                  <th>Precio Unit.</th><th>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody id="purchaseTableBody"></tbody>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-red" id="generatePdfWithPrices">
+              <i class="fas fa-file-pdf me-1"></i>Descargar PDF (con precios)
+            </button>
+            <button class="btn btn-gray" id="generatePdfNoPrices">
+              <i class="fas fa-file-pdf me-1"></i>Descargar PDF (sin precios)
+            </button>
+            <button class="btn btn-gray" data-bs-dismiss="modal">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== MODAL CARGAR PRECIOS ========== -->
+    <div class="modal fade" id="pricesModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-light">
+          <div class="modal-header">
+            <h5 class="modal-title">Cargar Precios Unitarios</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form id="pricesForm" class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Ladrillos</label>
+                <input type="number" step="0.01" id="price_bricks" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Cemento</label>
+                <input type="number" step="0.01" id="price_cement" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Arena</label>
+                <input type="number" step="0.01" id="price_sand" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Platicor</label>
+                <input type="number" step="0.01" id="price_plasticor" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Hierro</label>
+                <input type="number" step="0.01" id="price_iron" class="form-control">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-red" id="savePricesBtn">Guardar</button>
+            <button class="btn btn-gray" data-bs-dismiss="modal">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /Historial cálculos -->
+
+  <!-- ============ COMPRAS ============ -->
+  <div class="tab-pane fade" id="compras">
+
+    <!-- ---------- CREAR ORDEN ---------- -->
+    <h4>Crear Orden de Compra</h4>
+    <form id="orderItemForm" class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label">Nombre del Insumo</label>
+        <input id="itemName" class="form-control" required>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Unidades</label>
+        <input id="itemQty" type="number" min="1" class="form-control" required>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Precio Unitario</label>
+        <input id="itemPrice" type="number" step="0.01" class="form-control">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">ID (opcional)</label>
+        <input id="itemId" class="form-control">
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-gray w-100">
+          <i class="fas fa-plus me-1"></i>Agregar
+        </button>
+      </div>
+    </form>
+
+    <!-- Tabla temporal -->
+    <table class="table table-dark mt-3 mb-4">
+      <thead>
+        <tr><th>Insumo</th><th>Unidades</th>
+            <th>Precio U.</th><th>ID</th><th>Acciones</th></tr>
+      </thead>
+      <tbody id="orderItemsTable"></tbody>
+    </table>
+
+    <button id="finalizeOrderBtn" class="btn btn-red mb-4">
+      <i class="fas fa-clipboard-check me-1"></i>Finalizar Orden
+    </button>
+
+    <!-- ---------- HISTORIAL COMPRAS ---------- -->
+    <h4>Historial de Órdenes de Compra</h4>
+    <button id="exportPurchasesPdfBtn" class="btn btn-gray mb-2">
+      <i class="fas fa-file-pdf me-1"></i>Guardar información de compras
+    </button>
+    <ul id="ordersHistoryList" class="list-group"></ul>
+
+    <!-- MODAL detalle orden -->
+    <div class="modal fade" id="orderModal" tabindex="-1">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content bg-dark text-light">
+          <div class="modal-header">
+            <h5 class="modal-title">Detalle de Orden <span id="modalOrderId"></span></h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <table class="table table-dark">
+              <thead>
+                <tr><th>Insumo</th><th>Unidades</th><th>Precio U.</th><th>ID</th></tr>
+              </thead>
+              <tbody id="modalOrderBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /Compras -->
+
+  <!-- ============ PROVEEDORES ============ -->
+  <div class="tab-pane fade" id="proveedores">
+    <h4>Proveedores</h4>
+    <form id="providerForm" class="row g-3 mb-4">
+      <div class="col-md-3">
+        <label class="form-label">Nombre</label>
+        <input id="provName" class="form-control" required>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">CUIT</label>
+        <input id="provCuit" class="form-control" required>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Rubro</label>
+        <input id="provRubro" class="form-control" required>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">WhatsApp</label>
+        <input id="provWhatsapp" class="form-control" placeholder="54911xxxxxxx" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Dirección</label>
+        <input id="provAddress" class="form-control" required>
+      </div>
+      <div class="col-12 text-end">
+        <button type="submit" id="providerSubmitBtn" class="btn btn-red">
+          <i class="fas fa-save me-1"></i>Guardar Proveedor
+        </button>
+      </div>
+    </form>
+
+    <h5>Favoritos</h5>
+    <table class="table table-dark mb-4">
+      <thead>
+        <tr>
+          <th></th><th>Nombre</th><th>CUIT</th><th>Rubro</th>
+          <th>Dirección</th><th>WhatsApp</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="favoritesTableBody"></tbody>
+    </table>
+
+    <h5>Todos los Proveedores</h5>
+    <table class="table table-dark">
+      <thead>
+        <tr>
+          <th></th><th>Nombre</th><th>CUIT</th><th>Rubro</th>
+          <th>Dirección</th><th>WhatsApp</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="providersTableBody"></tbody>
+    </table>
+  </div><!-- /proveedores -->
+
+  </div><!-- /.tab-content -->
+</div><!-- /.container-fluid -->
+
+<!-- Bootstrap bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- ===================== JS GLOBAL ===================== -->
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+
+/* ==========================================================================
+   SECCIÓN 1 ─ HISTORIAL DE CÁLCULOS  (código ORIGINAL sin cambios)
+=========================================================================== */
+const clients=JSON.parse(localStorage.getItem('clientesData')||'[]');
+let history=[];
+let unitPrices=JSON.parse(localStorage.getItem('unitPrices')||'{}');
+Object.keys(localStorage).forEach(key=>{
+  if(!key.startsWith('materials_')||key.endsWith('_date'))return;
+  const idx=key.split('_')[1];
+  const m=JSON.parse(localStorage.getItem(key));
+  const dateKey=`${key}_date`;
+  let date=localStorage.getItem(dateKey);
+  if(!date){date=new Date().toISOString();localStorage.setItem(dateKey,date);}
+  const items=[];
+  if(m.bricks   !=null)items.push({key:'bricks',   name:'Ladrillos',qty:m.bricks});
+  if(m.cement   !=null)items.push({key:'cement',   name:'Cemento',   qty:m.cement});
+  if(m.sand     !=null)items.push({key:'sand',     name:'Arena',     qty:m.sand});
+  if(m.plasticor!=null)items.push({key:'plasticor',name:'Platicor',  qty:m.plasticor});
+  if(m.iron     !=null)items.push({key:'iron',     name:'Hierro',    qty:m.iron});
+  history.push({client:clients[idx]?.nombre||'Desconocido',date,items});
+});
+history.sort((a,b)=>new Date(b.date)-new Date(a.date));
+
+const historyList       =document.getElementById('historyList');
+const loadPricesBtn     =document.getElementById('loadPricesBtn');
+const pricesModal       =new bootstrap.Modal(document.getElementById('pricesModal'));
+const savePricesBtn     =document.getElementById('savePricesBtn');
+const purchaseModal     =new bootstrap.Modal(document.getElementById('purchaseModal'));
+const purchaseClient    =document.getElementById('purchaseClient');
+const purchaseTableBody =document.getElementById('purchaseTableBody');
+const generateWithBtn   =document.getElementById('generatePdfWithPrices');
+const generateNoPricesBtn=document.getElementById('generatePdfNoPrices');
+let currentIdx=null;
+
+function renderHistory(){
+  historyList.innerHTML='';
+  history.forEach((h,i)=>{
+    const li=document.createElement('li');
+    li.className='list-group-item d-flex justify-content-between align-items-center';
+    li.innerHTML=`
+      <div>
+        <strong>${h.client}</strong><br>
+        <small>${new Date(h.date).toLocaleString()}</small>
+      </div>
+      <button class="btn btn-sm btn-light"><i class="fas fa-eye"></i></button>`;
+    li.querySelector('button').onclick=()=>openModal(i);
+    historyList.appendChild(li);
+  });
+}
+function openModal(i){
+  currentIdx=i;
+  purchaseClient.textContent=history[i].client;
+  renderPurchaseTable(history[i].items);
+  purchaseModal.show();
+}
+function renderPurchaseTable(items){
+  purchaseTableBody.innerHTML='';
+  items.forEach(it=>{
+    const price=parseFloat(unitPrices[it.key]||0);
+    const subtotal=(it.qty*price).toFixed(2);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${it.name}</td><td>${it.qty}</td>
+      <td>${price.toFixed(2)}</td><td>${subtotal}</td>`;
+    purchaseTableBody.appendChild(tr);
+  });
+}
+loadPricesBtn.onclick=()=>{
+  ['bricks','cement','sand','plasticor','iron'].forEach(k=>{
+    document.getElementById('price_'+k).value=unitPrices[k]||'';
+  });
+  pricesModal.show();
+};
+savePricesBtn.onclick=()=>{
+  unitPrices={};
+  ['bricks','cement','sand','plasticor','iron'].forEach(k=>{
+    unitPrices[k]=parseFloat(document.getElementById('price_'+k).value)||0;
+  });
+  localStorage.setItem('unitPrices',JSON.stringify(unitPrices));
+  pricesModal.hide();
+};
+generateWithBtn.onclick=()=>{
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF();
+  const h=history[currentIdx];
+  doc.setFontSize(16);
+  doc.text('Remito de Compra (con precios)',14,20);
+  doc.setFontSize(12);
+  doc.text(`Cliente: ${h.client}`,14,30);
+  doc.text(`Fecha: ${new Date(h.date).toLocaleString()}`,14,36);
+  doc.autoTable({
+    startY:45,
+    head:[['Material','Cantidad','Precio U.','Subtotal']],
+    theme:'grid',
+    headStyles:{fillColor:[231,27,27],textColor:255},
+    body:h.items.map(it=>{
+      const p=parseFloat(unitPrices[it.key]||0);
+      return[it.name,it.qty,p.toFixed(2),(it.qty*p).toFixed(2)];
+    })
+  });
+  doc.save(`remito_con_precios_${h.client.replace(/\s+/g,'_')}.pdf`);
+};
+generateNoPricesBtn.onclick=()=>{
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF();
+  const h=history[currentIdx];
+  doc.setFontSize(16);
+  doc.text('Remito de Compra',14,20);
+  doc.setFontSize(12);
+  doc.text(`Cliente: ${h.client}`,14,30);
+  doc.text(`Fecha: ${new Date(h.date).toLocaleString()}`,14,36);
+  doc.autoTable({
+    startY:45,
+    head:[['Material','Cantidad']],
+    theme:'grid',
+    headStyles:{fillColor:[231,27,27],textColor:255},
+    body:h.items.map(it=>[it.name,it.qty])
+  });
+  doc.save(`remito_sin_precios_${h.client.replace(/\s+/g,'_')}.pdf`);
+};
+renderHistory();
+
+/* ==========================================================================
+   SECCIÓN 2 ─ PROVEEDORES  (código ORIGINAL sin cambios)
+=========================================================================== */
+let providers=JSON.parse(localStorage.getItem('providers')||'[]').map(p=>({
+  name:p.name,cuit:p.cuit,rubro:p.rubro,whatsapp:p.whatsapp,
+  address:p.address||'',favorite:p.favorite||false
+}));
+const providerForm      =document.getElementById('providerForm');
+const favoritesBody     =document.getElementById('favoritesTableBody');
+const providersBody     =document.getElementById('providersTableBody');
+const providerSubmitBtn =document.getElementById('providerSubmitBtn');
+let editingIndex=null;
+function saveProviders(){localStorage.setItem('providers',JSON.stringify(providers));}
+function renderProviders(){
+  favoritesBody.innerHTML='';providersBody.innerHTML='';
+  const favs=providers.filter(p=>p.favorite);
+  const others=providers.filter(p=>!p.favorite);
+  function renderRow(p,idx,container){
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>
+        <button class="star-button ${p.favorite?'favorito':''}" data-index="${idx}">
+          <i class="${p.favorite?'fas':'far'} fa-star"></i>
+        </button>
+      </td>
+      <td>${p.name}</td><td>${p.cuit}</td><td>${p.rubro}</td><td>${p.address}</td>
+      <td>
+        <a target="_blank" href="https://api.whatsapp.com/send?phone=${p.whatsapp}&text=${encodeURIComponent('Hola, nos comunicamos de Viviendas Sion para pedir presupuesto')}" class="btn btn-sm btn-light">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </td>
+      <td>
+        <button class="action-btn edit-btn" data-index="${idx}"><i class="fas fa-edit"></i></button>
+        <button class="action-btn delete-btn" data-index="${idx}"><i class="fas fa-trash"></i></button>
+      </td>`;
+    container.appendChild(tr);
+  }
+  favs.forEach(p=>renderRow(p,providers.indexOf(p),favoritesBody));
+  others.forEach(p=>renderRow(p,providers.indexOf(p),providersBody));
+
+  document.querySelectorAll('.star-button').forEach(btn=>btn.onclick=()=>{
+    const i=+btn.dataset.index;
+    providers[i].favorite=!providers[i].favorite;
+    saveProviders();renderProviders();
+  });
+  document.querySelectorAll('.edit-btn').forEach(btn=>btn.onclick=()=>{
+    const i=+btn.dataset.index;editingIndex=i;
+    const p=providers[i];
+    document.getElementById('provName').value     =p.name;
+    document.getElementById('provCuit').value     =p.cuit;
+    document.getElementById('provRubro').value    =p.rubro;
+    document.getElementById('provWhatsapp').value =p.whatsapp;
+    document.getElementById('provAddress').value  =p.address;
+    providerSubmitBtn.innerHTML='<i class="fas fa-save me-1"></i>Actualizar Proveedor';
+  });
+  document.querySelectorAll('.delete-btn').forEach(btn=>btn.onclick=()=>{
+    const i=+btn.dataset.index;providers.splice(i,1);
+    saveProviders();renderProviders();
+  });
+}
+providerForm.onsubmit=e=>{
+  e.preventDefault();
+  const p={
+    name:document.getElementById('provName').value.trim(),
+    cuit:document.getElementById('provCuit').value.trim(),
+    rubro:document.getElementById('provRubro').value.trim(),
+    whatsapp:document.getElementById('provWhatsapp').value.trim(),
+    address:document.getElementById('provAddress').value.trim(),
+    favorite:false
+  };
+  if(editingIndex!==null){
+    p.favorite=providers[editingIndex].favorite;
+    providers[editingIndex]=p;
+    editingIndex=null;
+    providerSubmitBtn.innerHTML='<i class="fas fa-save me-1"></i>Guardar Proveedor';
+  }else{providers.push(p);}
+  saveProviders();providerForm.reset();renderProviders();
+};
+renderProviders();
+
+/* ==========================================================================
+   SECCIÓN 3 ─ NUEVA LÓGICA DE COMPRAS
+=========================================================================== */
+let tempItems=[];                               // Ítems de la orden en curso
+let purchases=JSON.parse(localStorage.getItem('purchases')||'[]');
+const itemsTBody=document.getElementById('orderItemsTable');
+const orderForm =document.getElementById('orderItemForm');
+const ordersUL  =document.getElementById('ordersHistoryList');
+const finalizeOrderBtn=document.getElementById('finalizeOrderBtn');
+const exportPurchasesBtn=document.getElementById('exportPurchasesPdfBtn');
+const orderModal   =new bootstrap.Modal(document.getElementById('orderModal'));
+const modalBody    =document.getElementById('modalOrderBody');
+const modalOrderId =document.getElementById('modalOrderId');
+
+function renderTempItems(){
+  itemsTBody.innerHTML='';
+  tempItems.forEach((it,idx)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${it.name}</td><td>${it.qty}</td>
+      <td>${it.price??'-'}</td><td>${it.id||'-'}</td>
+      <td><button class="btn btn-sm btn-light" data-idx="${idx}">
+            <i class="fas fa-trash"></i></button></td>`;
+    tr.querySelector('button').onclick=()=>{tempItems.splice(idx,1);renderTempItems();};
+    itemsTBody.appendChild(tr);
+  });
+}
+orderForm.onsubmit=e=>{
+  e.preventDefault();
+  tempItems.push({
+    name :document.getElementById('itemName').value.trim(),
+    qty  :+document.getElementById('itemQty').value,
+    price:document.getElementById('itemPrice').value?+document.getElementById('itemPrice').value:null,
+    id   :document.getElementById('itemId').value.trim()||null
+  });
+  orderForm.reset();renderTempItems();
+};
+finalizeOrderBtn.onclick=()=>{
+  if(!tempItems.length){alert('Agrega al menos un insumo');return;}
+  purchases.push({
+    id:Date.now(),date:new Date().toISOString(),
+    items:structuredClone(tempItems),
+    requested:false,status:'No pedido'
+  });
+  localStorage.setItem('purchases',JSON.stringify(purchases));
+  tempItems=[];renderTempItems();renderOrders();
+};
+function renderOrders(){
+  ordersUL.innerHTML='';
+  purchases.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  purchases.forEach((o,idx)=>{
+    const li=document.createElement('li');
+    li.className='list-group-item';
+    li.innerHTML=`
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <strong>Orden #${idx+1}</strong><br>
+          <small>${new Date(o.date).toLocaleString()}</small>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <input type="checkbox" class="form-check-input" ${o.requested?'checked':''} data-idx="${idx}" title="Pedido">
+          <select class="form-select form-select-sm" data-idx="${idx}" style="width:120px">
+            <option${o.status==='No pedido'?' selected':''}>No pedido</option>
+            <option${o.status==='En proceso'?' selected':''}>En proceso</option>
+            <option${o.status==='Finalizado'?' selected':''}>Finalizado</option>
+          </select>
+          <button class="btn btn-sm btn-light" data-detail="${idx}">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+      </div>`;
+    li.querySelector('input').onchange=e=>{
+      const i=+e.target.dataset.idx;purchases[i].requested=e.target.checked;savePurchases();
+    };
+    li.querySelector('select').onchange=e=>{
+      const i=+e.target.dataset.idx;purchases[i].status=e.target.value;savePurchases();
+    };
+    li.querySelector('button').onclick=()=>openOrderModal(idx);
+    ordersUL.appendChild(li);
+  });
+}
+function savePurchases(){localStorage.setItem('purchases',JSON.stringify(purchases));}
+function openOrderModal(i){
+  const o=purchases[i];
+  modalOrderId.textContent='#'+(i+1);
+  modalBody.innerHTML='';
+  o.items.forEach(it=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${it.name}</td><td>${it.qty}</td><td>${it.price??'-'}</td><td>${it.id||'-'}</td>`;
+    modalBody.appendChild(tr);
+  });
+  orderModal.show();
+}
+exportPurchasesBtn.onclick=()=>{
+  if(!purchases.length){alert('No hay órdenes guardadas');return;}
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'landscape'});
+  doc.setFontSize(16);doc.text('Informe de Compras',14,18);doc.setFontSize(12);
+  let y=26;
+  purchases.forEach((o,idx)=>{
+    doc.text(`Orden #${idx+1} — ${new Date(o.date).toLocaleString()} — Estado: ${o.status} — Pedido: ${o.requested?'Sí':'No'}`,14,y);
+    y+=6;
+    doc.autoTable({
+      startY:y,
+      head:[['Insumo','Unidades','Precio U.','ID']],
+      body:o.items.map(it=>[it.name,it.qty,it.price??'-',it.id||'-']),
+      theme:'grid',
+      headStyles:{fillColor:[231,27,27],textColor:255},
+      margin:{left:14,right:14}
+    });
+    y=doc.lastAutoTable.finalY+10;
+    if(y>180){doc.addPage({orientation:'landscape'});y=20;}
+  });
+  doc.save('informe_compras.pdf');
+};
+renderTempItems();renderOrders();
+
+/* ==========================================================================
+   FIN
+=========================================================================== */
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Contacto</title>
+    <meta charset="utf-8">
+    <meta name = "format-detection" content = "telephone=no" />
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/grid.css">
+    <link rel="stylesheet" href="css/contact-form.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/jquery.js"></script>
+    <script src="js/jquery-migrate-1.2.1.js"></script>
+    <script src="js/TMform.js"></script>
+    <script src="js/modal.js"></script>
+    <!--[if (gt IE 9)|!(IE)]><!-->
+    <script src="js/wow/wow.js"></script>
+    <script>
+        $(document).ready(function () {
+            if ($('html').hasClass('desktop')) {
+                new WOW().init();
+            }
+        });
+    </script>
+    <!--<![endif]-->
+    <!--[if lt IE 9]>
+    <script src="js/html5shiv.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="css/ie.css">
+    <div style=' clear: both; text-align:center; position: relative;'>
+        <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+            <img src="http://storage.ie6countdown.com/assets/100/images/banners/warning_bar_0000_us.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today." />
+        </a>
+    </div>
+    <![endif]-->
+</head>
+
+<body>
+
+<!--========================================================
+                          HEADER
+=========================================================-->
+<header id="header">
+    <div id="stuck_container">
+        <div class="container">
+            <div class="row">
+                <div class="grid_12">
+                    <nav>
+                        <ul class="sf-menu">
+                            <li class="current"><a href="index.html">home</a></li>
+                <li><a href="index-1.html">quienes somos</a></li>
+                <li><a href="cuerpodocente.html">Cuerpo docente</a></li>
+                <li><a href="cursos.html">cursos</a>
+                                <ul>
+                                    <li><a href="robotica.html">robótica + impresión 3d </a></li>
+                                    <li><a href="domotica.html">cámaras, alarmas y domótica</a></li>
+                                    <li><a href="render.html">diseño y renderización</a></li>
+                                    <li><a href="ingles.html">ingles</a>
+                                        <ul>
+                                            <li><a href="#">preparación para exámenes internacionales</a></li>
+                                            <li><a href="#">apoyo escolar primario</a></li>
+                                            <li><a href="#">apoyo escolar secundario</a></li>
+                                        </ul>
+                                    </li>
+                                  </ul>
+                              </li>
+                              <li><a href="index-4.html">Contacto</a></li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="img-background1">
+        <div class="header_1 header_1__inset1">
+            <div class="container">
+                <div class="row">
+                    <div class="grid_12">
+                        <h1><a href="index.html"><img src="images/logo.png" alt=""></a></h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<!--========================================================
+                          CONTENT
+=========================================================-->
+<section id="content" class="negative-margin1">
+    <div class="wrapper9">
+        <div class="container">
+            <div class="row">
+                <div class="grid_12">
+                    <h2 class="wow bounceInLeft">ubicación</h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="grid_12">
+                    <div class="google-map_contacts wow bounceInRight">
+                        <iframe src="images/mapa.png" style="border:0"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="wrapper8">
+        <div class="container">
+            <div class="row">
+                <div class="grid_4">
+                    <h2>address</h2>
+                    <address class="contact-page_address wow bounceInDown">
+                        <span class="our-address">8901 Marmora Road,<br>Glasgow, D04 89GR.</span>
+                        <dl>
+                            <dt>
+                                <span class="numbers">Freephone:</span><span>+1 800 559 6580</span><br>
+                                <span class="numbers telephone">Telephone:</span><span>+1 959 603 6035</span><br>
+                                <span class="numbers fax">FAX:</span><span>+1 504 889 9898</span><br>
+                                <span class="numbers">E-mail: </span><span><a href="#" class="simple-link"><span class="__cf_email__" data-cfemail="402d21292c0024252d2f2c292e2b6e2f3227">[email&#160;protected]</span></a></span><br>
+                            </dt>
+                            <dd></dd>
+                        </dl>
+                    </address>
+                </div>
+                <div class="grid_6">
+                    <h2>get in touch</h2>
+                    <form id="contact-form">
+                    <div class="contact-form-loader"></div>
+                        <fieldset>
+                            <label class="name">
+                                <input type="text" name="name" placeholder="Name:" data-constraints="@Required @JustLetters" />
+                                <span class="empty-message">*This field is required.</span>
+                            </label>
+                            <label class="email">
+                                <input type="text" name="email" placeholder="E-mail:" value=""
+                                       data-constraints="@Required @Email" />
+                                <span class="empty-message">*This field is required.</span>
+                                <span class="error-message">*This is not a valid email.</span>
+                            </label>
+                            <label class="phone">
+                                <input type="text" name="phone" placeholder="Phone:" value=""
+                                       data-constraints="@Required @JustNumbers" />
+                                <span class="empty-message">*This field is required.</span>
+                                <span class="error-message">*This is not a valid phone.</span>
+                            </label>
+
+
+                            <label class="message">
+                                <textarea name="message" placeholder="Message:" data-constraints='@Required @Length(min=20,max=999999)'></textarea>
+                                <span class="empty-message">*This field is required.</span>
+                                <span class="error-message">*The message is too short.</span>
+                            </label>
+
+                            <!-- <label class="recaptcha"><span class="empty-message">*This field is required.</span></label> -->
+                            <div class="contact-form-buttons">
+                                <a href="#" data-type="reset" class="btn-default">clear</a>
+                                <a href="#" data-type="submit" class="btn-default">submit</a>
+                            </div>
+                        </fieldset>
+                        <div class="modal fade response-message">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                        <h4 class="modal-title">Modal title</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        You message has been sent! We will be in touch soon.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<!--========================================================
+                          FOOTER
+=========================================================-->
+<footer id="footer">
+    <div class="container">
+        <div class="row">
+            <div class="grid_12">
+                <div class="footer_block wow bounceInLeft">
+                    <a href="index.html" class="footer_logo_link"><img src="images/logo_footer.png" alt=""/></a>
+                    <div class="policy"><span class="copyright">&copy;</span><span id="copyright-year"></span><span class="divider1">|</span><a href="index-5.html">Privacy policy</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="js/script.js"></script>
+</body>
+</html>

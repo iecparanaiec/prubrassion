@@ -1,0 +1,124 @@
+/* Reutiliza las variables de style.css */
+
+.clients-list {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 0 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  /* Tarjeta de promoción */
+  .promo-item {
+    background: var(--crm-gray);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    transition: transform .1s;
+  }
+  .promo-item:hover {
+    transform: translateY(-2px);
+  }
+  
+  .promo-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 4px;
+    object-fit: cover;
+    margin-right: 12px;
+  }
+  
+  .promo-info {
+    flex: 1;
+  }
+  .promo-title {
+    font-weight: 500;
+    color: var(--text-dark);
+  }
+  .promo-meta {
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    opacity: 0.8;
+  }
+  
+  /* Flecha de detalle */
+  .promo-arrow {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    color: var(--text-dark);
+    cursor: pointer;
+  }
+  
+  /* Cambia el estilo del buscador si quieres */
+  .search-container {
+    position: relative;
+    padding: 0 12px 8px;
+  }
+  #searchInput {
+    width: 100%;
+    padding: 8px 40px 8px 12px;
+    background: var(--text-light);
+    color: var(--text-dark);
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    font-size: 1rem;
+  }
+  .search-icon {
+    position: absolute;
+    top: 50%;
+    right: 24px;
+    transform: translateY(-50%);
+    color: #888;
+  }
+  
+  /* Modal detalle (igual que clientes) */
+  .detail-modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .detail-content {
+    background: var(--text-light);
+    color: var(--text-dark);
+    border-radius: 8px;
+    padding: 16px;
+    width: 90%; max-width: 360px;
+    max-height: 80%; overflow-y: auto;
+    position: relative;
+  }
+  .detail-close {
+    position: absolute;
+    top: 8px; right: 12px;
+    background: none; border: none;
+    font-size: 1.5rem; color: var(--text-dark);
+    cursor: pointer;
+  }
+  .detail-content h3 {
+    margin-top: 0; margin-bottom: 8px;
+    font-size: 1.25rem; text-align: center;
+  }
+  .detail-content table {
+    width: 100%; border-collapse: collapse;
+    margin-bottom: 12px;
+  }
+  .detail-content td {
+    padding: 6px 4px;
+    border-bottom: 1px solid #ddd;
+    font-size: 0.9rem;
+  }
+  .detail-content td:first-child {
+    font-weight: 600;
+    width: 40%;
+  }
+  

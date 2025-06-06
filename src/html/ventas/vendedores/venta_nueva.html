@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nueva Venta – Viviendas Sion</title>
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <style>
+    /* Elevar autocomplete */
+    .pac-container { z-index: 2000 !important; }
+
+    :root {
+      --bg-dark: #121212;
+      --bg-surface: #242424;
+      --text-light: #e0e0e0;
+      --accent: #e30613;
+      --shadow-elevation: rgba(0,0,0,0.3);
+    }
+    body {
+      margin:0; height:100vh;
+      font-family:'Roboto',sans-serif;
+      background:var(--bg-dark); color:var(--text-light);
+      overflow:hidden;
+    }
+    .app-bar {
+      position:fixed; top:0; left:0; right:0;
+      height:56px; background:var(--accent);
+      display:flex; align-items:center; padding:0 1rem;
+      box-shadow:0 2px 4px var(--shadow-elevation); z-index:10;
+    }
+    .app-bar .brand img { height:32px; margin-right:.5rem; }
+    .main-content {
+      position:absolute; top:56px; bottom:0; left:0; right:0;
+      padding:1.5rem; overflow-y:auto;
+    }
+    .wizard-nav { display:flex; justify-content:space-between; margin-bottom:1rem; }
+    .step-indicator {
+      flex:1; text-align:center; padding:.5rem;
+      border-bottom:3px solid #444; color:#777; font-weight:500;
+    }
+    .step-indicator.active { color:#fff; border-color:var(--accent); }
+    .wizard-step { display:none; }
+    .wizard-step.active { display:block; }
+    #fileList { margin-top:.5rem; max-height:100px; overflow-y:auto; font-size:.9rem; }
+    #fileList div { padding:.25rem .5rem; background:#1e1e1e; border-radius:4px; margin-bottom:.25rem; }
+    .form-control-app, .form-select.form-control-app {
+      background:rgba(255,255,255,0.05);
+      border:none; color:var(--text-light);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="app-bar">
+    <div class="brand">
+      <img src="logo.png" alt="Logo"> Nueva Venta
+    </div>
+  </header>
+
+  <main class="main-content">
+    <form id="newSaleWizard">
+      <div class="wizard-nav">
+        <div class="step-indicator active" data-step="1">1. Datos Generales</div>
+        <div class="step-indicator" data-step="2">2. Precio & Fecha</div>
+        <div class="step-indicator" data-step="3">3. Financiación & Archivos</div>
+        <div class="step-indicator" data-step="4">4. Observaciones</div>
+      </div>
+
+      <!-- Paso 1 -->
+      <div class="wizard-step active" data-step="1">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label">Nro. de Cuenta</label>
+            <input type="text" id="saleAccount" class="form-control form-control-app" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Fecha de Alta</label>
+            <input type="date" id="saleRegDate" class="form-control form-control-app" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Apellido y Nombre</label>
+            <input type="text" id="saleName" class="form-control form-control-app" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">DNI</label>
+            <input type="text" id="saleDocNumber" class="form-control form-control-app" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Fecha Nac.</label>
+            <input type="date" id="saleBirth" class="form-control form-control-app" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Provincia</label>
+            <input type="text" id="saleProvince" class="form-control form-control-app" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Localidad</label>
+            <input type="text" id="saleCity" class="form-control form-control-app" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Dirección</label>
+            <input type="text" id="saleAddress" class="form-control form-control-app" placeholder="Comienza a escribir..." required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Teléfono Fijo</label>
+            <input type="tel" id="salePhone" class="form-control form-control-app">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Internos / Desc.</label>
+            <input type="text" id="saleInternal" class="form-control form-control-app">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Tel. Fax</label>
+            <input type="tel" id="saleFax" class="form-control form-control-app">
+          </div>
+        </div>
+      </div>
+
+      <!-- Paso 2 -->
+      <div class="wizard-step" data-step="2">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Precio (ARS)</label>
+            <input type="number" id="salePrice" class="form-control form-control-app" required>
+        </div>
+          <div class="col-md-4">
+            <label class="form-label">Fecha de Venta</label>
+            <input type="date" id="saleDate" class="form-control form-control-app" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Método de pago</label>
+            <select id="salePaymentMethod" class="form-select form-control-app">
+              <option>Anticipo</option>
+              <option>Contado</option>
+              <option>Financiado</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paso 3 -->
+      <div class="wizard-step" data-step="3">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label">Días para venc.</label>
+            <input type="number" id="saleDaysToDue" class="form-control form-control-app" value="0">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Tasa interés (%)</label>
+            <input type="number" id="saleInterestRate" class="form-control form-control-app" value="0">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Crédito máximo</label>
+            <input type="number" id="saleMaxCredit" class="form-control form-control-app" value="0">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Adjuntar documentos</label>
+            <input type="file" id="saleFiles" class="form-control form-control-app" multiple>
+            <div id="fileList"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paso 4 -->
+      <div class="wizard-step" data-step="4">
+        <div class="mb-3">
+          <label class="form-label">Observaciones</label>
+          <textarea id="saleNotes" class="form-control form-control-app" rows="6"></textarea>
+        </div>
+      </div>
+
+      <!-- Navegación -->
+      <div class="d-flex justify-content-between mt-4">
+        <button type="button" class="btn btn-light text-dark" id="prevStepBtn" disabled>Atrás</button>
+        <button type="button" class="btn btn-light text-dark" id="nextStepBtn">Siguiente</button>
+        <button type="button" class="btn btn-accent text-white d-none" id="submitWizardBtn">Enviar</button>
+      </div>
+
+    </form>
+  </main>
+
+  <!-- Google Maps API -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB-C_IPlrBJMHXeSILeOjnyTqd2-jVKRig&libraries=places&callback=initGoogleMap" async defer></script>
+  <!-- Bootstrap & Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+  <script>
+    const steps = [...document.querySelectorAll('.wizard-step')];
+    const navs  = [...document.querySelectorAll('.step-indicator')];
+    let current = 0;
+    function showStep(i) {
+      steps.forEach((s,j)=> s.classList.toggle('active', j===i));
+      navs .forEach((n,j)=> n.classList.toggle('active', j===i));
+      document.getElementById('prevStepBtn').disabled = i===0;
+      document.getElementById('nextStepBtn').classList.toggle('d-none', i===steps.length-1);
+      document.getElementById('submitWizardBtn').classList.toggle('d-none', i<steps.length-1);
+      if (i===3) fillObservations();
+    }
+    document.getElementById('nextStepBtn').addEventListener('click', ()=>{
+      const req = steps[current].querySelectorAll('[required]');
+      for (let inp of req) if (!inp.value) { inp.focus(); return; }
+      current++; showStep(current);
+    });
+    document.getElementById('prevStepBtn').addEventListener('click', ()=>{
+      if (current>0) { current--; showStep(current); }
+    });
+
+    function fillObservations(){
+      const f = document.getElementById('newSaleWizard');
+      document.getElementById('saleNotes').value = 
+        `Cliente: ${f.saleName.value} (Cuenta ${f.saleAccount.value})\n`+
+        `DNI: ${f.saleDocNumber.value}\n`+
+        `Dirección: ${f.saleAddress.value}, ${f.saleCity.value}, ${f.saleProvince.value}\n`+
+        `Tel: ${f.salePhone.value} / Interno: ${f.saleInternal.value}\n`+
+        `Vendedor: ${f.saleVendor.value}\n`+
+        `Precio: $${f.salePrice.value} - ${f.salePaymentMethod.value}`;
+    }
+
+    // File preview
+    document.getElementById('saleFiles').addEventListener('change', function(){
+      const list = document.getElementById('fileList'); list.innerHTML='';
+      for (let f of this.files){
+        const d=document.createElement('div');
+        d.textContent = `${f.name} (${(f.size/1024).toFixed(1)} KB)`;
+        list.append(d);
+      }
+    });
+
+    // Google Maps
+    let autocomplete;
+    function initGoogleMap(){
+      autocomplete = new google.maps.places.Autocomplete(
+        document.getElementById('saleAddress'),{types:['address']}
+      );
+    }
+
+    // Submit logic
+    document.getElementById('submitWizardBtn').addEventListener('click', ()=>{
+      const f=document.getElementById('newSaleWizard');
+      const data = { 
+        cuenta:f.saleAccount.value,
+        nombre:f.saleName.value,
+        doc:f.saleDocNumber.value,
+        direccion:f.saleAddress.value,
+        telefono:f.salePhone.value,
+        precio:f.salePrice.value,
+        notas:f.saleNotes.value,
+        archivos:[...document.getElementById('saleFiles').files].map(x=>x.name)
+      };
+      console.log('Venta cargada:', data);
+      alert('Venta guardada con éxito');
+      // redirigir o limpiar
+    });
+
+  </script>
+</body>
+</html>

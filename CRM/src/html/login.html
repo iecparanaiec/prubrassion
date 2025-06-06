@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Acceso - CRM Viviendas Sion</title>
+  <link rel="stylesheet" href="assets/css/login.css" />
+</head>
+<body>
+  <!-- Splash screen -->
+  <div id="splash" class="splash">
+    <img src="/assets/images/logo.jpg" alt="Logo Viviendas Sion" class="splash-logo" />
+  </div>
+
+  <!-- Login container -->
+  <div id="loginContainer" class="login-container">
+    <div class="logo-wrapper">
+      <img src="/assets/images/logo.jpg" alt="Logo Viviendas Sion" class="logo" />
+    </div>
+
+    <form id="loginForm" class="login-form">
+      <input type="text" id="loginUsername" placeholder="Usuario" required />
+      <input type="password" id="loginPassword" placeholder="Contraseña" required />
+      <div class="actions">
+        <button type="submit" class="btn-submit">Ingresar</button>
+        <a href="#" id="forgotLink" class="link">¿Olvidaste tu contraseña?</a>
+      </div>
+    </form>
+
+    <div id="loading" class="loading-overlay">
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+  <script src="/login.bundle.js"></script>
+</body>
+</html>

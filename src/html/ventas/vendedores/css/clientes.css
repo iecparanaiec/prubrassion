@@ -1,0 +1,267 @@
+/* ==== Variables de color (ya definidas en tu style.css) ==== */
+:root {
+    --crm-red:    #e30613;
+    --crm-dark:   #242424;
+    --crm-gray:   #d3d3d3;
+    --text-light: #ffffff;
+    --text-dark:  #000000;
+  }
+  
+  /* ==== Body y contenedor principal ==== */
+  .clients-body {
+    background: var(--crm-dark);
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* evita scroll en body */
+  }
+  
+  .clients-container {
+    width: 100%;
+    max-width: 360px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--crm-dark);
+    overflow: hidden; /* sólo .clients-list scrolla */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* ==== Header (flecha + título) ==== */
+  .clients-header {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+  }
+  
+  .back-btn {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-size: 1.5rem;
+    margin-right: 8px;
+  }
+  
+  .clients-title {
+    flex: 1;
+    color: var(--text-light);
+    font-size: 1.25rem;
+    font-weight: 500;
+  }
+  
+  /* ==== Buscador ==== */
+  .search-container {
+    position: relative;
+    padding: 0 12px 8px;
+    z-index: 1;
+  }
+  
+  #searchInput {
+    width: 100%;
+    padding: 8px 40px 8px 12px;
+    background: var(--text-light);   /* blanco */
+    color: var(--text-dark);         /* negro */
+    border: 1px solid #ccc;          /* borde sutil */
+    border-radius: 20px;
+    font-size: 1rem;
+  }
+  
+  .search-icon {
+    position: absolute;
+    top: 50%;
+    right: 24px;
+    transform: translateY(-50%);
+    color: #888;
+    pointer-events: none;
+  }
+  
+  /* ==== Listado scrollable ==== */
+  .clients-list {
+    flex: 1 1 auto;    /* ocupa todo el espacio sobrante */
+    overflow-y: auto;  /* permite scroll sólo aquí */
+    padding: 0 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 8px; /* un pequeño margen sobre el botón cerrar */
+  }
+  
+  /* ==== Tarjetas de cliente ==== */
+  .client-item {
+    background: var(--crm-gray);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .client-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  
+  .client-info {
+    flex: 1;
+    margin: 0 12px;
+  }
+  
+  .client-name {
+    display: block;
+    color: var(--text-dark);
+    font-size: 1.05rem;
+    font-weight: 500;
+  }
+  
+  .client-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--crm-red);
+    color: var(--text-light);
+    border-radius: 12px;
+    padding: 4px 8px;
+    font-size: 0.9rem;
+  }
+  
+  /* ==== Flecha de detalle ==== */
+  .client-arrow {
+    color: var(--text-dark);
+    font-size: 1.2rem;
+    transition: transform .2s;
+  }
+  
+  .client-item.expanded .client-arrow {
+    transform: rotate(90deg);
+  }
+  
+  /* ==== Detalles desplegables ==== */
+  .client-details {
+    display: none;
+    background: var(--text-light);
+    padding: 8px;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+  }
+  
+  .client-item.expanded .client-details {
+    display: block;
+  }
+  
+  /* ==== Botón Cerrar ==== */
+  .btn-close-modal {
+    margin: 8px 0;
+    align-self: center;
+  }
+/* ----------------------------- */
+/* Posicionamiento de la flecha  */
+/* ----------------------------- */
+.client-item {
+    position: relative;                /* para que el absolute de la flecha apunte aquí */
+    display: flex !important;          /* fila única */
+    align-items: center !important;    /* centrado vertical */
+    padding-right: 40px;               /* espacio para la flecha */
+  }
+  
+  .client-arrow {
+    position: absolute;
+    right: 12px;                       /* separación del borde derecho */
+    top: 50%;                          /* centro vertical */
+    transform: translateY(-50%);       /* ajuste perfecto al medio */
+    font-size: 1.2rem;
+    color: var(--text-dark);
+  }
+/* =============================== */
+/* Modal superpuesto de detalles   */
+/* =============================== */
+.detail-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: none;               /* oculto por defecto */
+    align-items: center;         /* centrar vertical */
+    justify-content: center;     /* centrar horizontal */
+    z-index: 1000;
+  }
+  
+  .detail-content {
+    background: var(--text-light);
+    color: var(--text-dark);
+    border-radius: 8px;
+    padding: 16px;
+    width: 90%;
+    max-width: 360px;
+    max-height: 80%;
+    overflow-y: auto;
+    position: relative;
+  }
+  
+  .detail-close {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-dark);
+    cursor: pointer;
+  }
+  
+  .detail-content h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 1.25rem;
+    text-align: center;
+  }
+  
+  .detail-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 8px;
+  }
+  
+  .detail-content td {
+    padding: 6px 4px;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .detail-content td:first-child {
+    font-weight: 600;
+    width: 40%;
+  }
+  .detail-content {
+    /* ya lo tenías: */
+    background: var(--text-light);
+    color: var(--text-dark);
+    border-radius: 8px;
+    padding: 16px;
+    width: 90%;
+    max-width: 360px;
+    max-height: 80%;
+    overflow-y: auto;    /* permite scroll dentro del modal */
+    position: relative;
+  }
+      
+  /* Dentro de promociones.css, al final: */
+.view-clients-badge {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 8px;
+  background: var(--crm-red);
+  color: var(--text-light);
+  border-radius: 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.view-clients-badge:hover {
+  background: #c00510;
+}

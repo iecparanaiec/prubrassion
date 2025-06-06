@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Administrativo del Casino</title>
+<link rel="stylesheet" href="panel.css">
+</head>
+<body>
+
+<div id="menu-toggle" class="menu-toggle">&#9776; Menú</div>
+
+<aside class="sidebar">
+  <nav>
+    <ul>
+      <li><a href="#dashboard">Dashboard</a></li>
+      <li><a href="#gestion-usuarios" class="active">Gestión de Usuarios</a></li>
+      <li><a href="#informes">Informes Financieros</a></li>
+      <li><a href="#configuracion">Configuración del Sitio</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<header>
+  <div class="logo">Logo del Casino</div>
+  <h1>Panel Administrativo</h1>
+  <div class="admin-options">Admin | Configuración | Salir</div>
+</header>
+
+<main class="content">
+  <!-- Contenido de las pestañas aquí -->
+  <section id="dashboard" class="tab-content">
+    <!-- Contenido del Dashboard -->
+    <h2>Dashboard</h2>
+  </section>
+
+  <section id="gestion-usuarios" class="tab-content active">
+    <!-- Contenido de Gestión de Usuarios -->
+    <h2>Gestión de Usuarios</h2>
+    <!-- Más contenido aquí -->
+  </section>
+
+  <section id="informes" class="tab-content">
+    <!-- Contenido de Informes Financieros -->
+    <h2>Informes Financieros</h2>
+  </section>
+
+  <section id="configuracion" class="tab-content">
+    <!-- Contenido de Configuración del Sitio -->
+    <h2>Configuración del Sitio</h2>
+  </section>
+</main>
+
+<script src="panel.js"></script>
+</body>
+</html>

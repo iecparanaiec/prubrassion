@@ -1,0 +1,142 @@
+/* turnos.css */
+
+/* ==== Permitir scroll en toda la página ==== */
+html, body {
+    height: auto !important;
+    overflow: visible !important;
+  }
+  
+  /* ==== Contenedor principal ==== */
+  .clients-body {
+    background: var(--crm-dark);
+    height: auto !important;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow-y: auto !important;
+  }
+  
+  .clients-container {
+    width: 100%;
+    max-width: 100% !important;  /* ocupa todo el ancho del modal */
+    height: auto !important;
+    display: flex;
+    flex-direction: column;
+    background: var(--crm-dark);
+    overflow: visible;
+    padding: 16px;
+    gap: 12px;
+  }
+  
+  /* ==== Formulario ==== */
+  .form-label {
+    color: var(--text-light);
+    font-weight: 500;
+  }
+  .form-control,
+  .form-select {
+    background: var(--crm-dark);
+    color: var(--text-light);
+    border: 1px solid var(--crm-gray);
+    border-radius: 8px;
+  }
+  
+  /* ==== Layout Turnos Hoy + Calendario ==== */
+  .turnos-row {
+    /* eliminado overflow hidden para permitir scroll */
+    display: block;
+  }
+  
+  /* ==== Listado Turnos Hoy ==== */
+  #todayAppointments {
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 0;
+    list-style: none;
+  }
+  #todayAppointments .client-item {
+    margin-bottom: 8px;
+  }
+  
+  /* ==== Calendario completo ==== */
+  #calendar {
+    width: 100% !important;
+    min-height: 500px;        /* permite ver varias semanas */
+    background: var(--crm-gray);
+    border-radius: 12px;
+    padding: 8px;
+    /* flex properties no aplican tras hacer el contenedor scrollable */
+  }
+  
+  /* ==== Modal detalle de día ==== */
+  .detail-modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .detail-content {
+    background: var(--crm-dark);
+    color: var(--text-light);
+    border-radius: 12px;
+    padding: 16px;
+    width: 90%; max-width: 360px;
+    max-height: 80%; overflow-y: auto;
+    position: relative;
+  }
+  .detail-close {
+    position: absolute;
+    top: 8px; right: 12px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-light);
+    cursor: pointer;
+  }
+  .detail-content h3 {
+    margin-top: 0; margin-bottom: 12px;
+    font-size: 1.25rem;
+    text-align: center;
+  }
+  
+  /* ==== FullCalendar custom ==== */
+  .fc {
+    background: var(--crm-gray);
+    color: var(--text-dark);
+    font-family: 'Roboto', sans-serif;
+  }
+  .fc-toolbar-title {
+    color: var(--text-dark);
+  }
+  .fc-button {
+    background: var(--crm-dark) !important;
+    border: 1px solid var(--crm-gray) !important;
+    color: var(--text-light) !important;
+    border-radius: 4px !important;
+  }
+  .fc-button:hover,
+  .fc-button:focus {
+    background: var(--crm-dark) !important;
+    border-color: var(--text-light) !important;
+    color: var(--crm-red) !important;
+  }
+  .fc-col-header-cell-cushion {
+    color: var(--text-light) !important;
+    background: var(--crm-dark) !important;
+    padding: 4px 0;
+  }
+  .fc-daygrid-day-number {
+    color: var(--text-light) !important;
+  }
+  .fc-daygrid-day {
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+  .fc-scrollgrid-sync-inner {
+    background: var(--crm-gray) !important;
+  }
+  

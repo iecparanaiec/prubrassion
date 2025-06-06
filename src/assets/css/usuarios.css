@@ -1,0 +1,59 @@
+:root {
+    --bg-surface: #242424;
+    --text-light: #e0e0e0;
+    --accent: #e30613;
+  }
+  
+  body {
+    background: var(--bg-surface);
+    color: var(--text-light);
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  h2 {
+    text-align: center;
+    color: var(--accent);
+  }
+  
+  #btnAdd {
+    background: var(--accent);
+    border: none;
+  }
+  
+  #btnAdd:hover {
+    filter: brightness(0.9);
+  }
+  
+  .table-dark th {
+    background: var(--bg-surface);
+  }
+  
+  .modal-content {
+    background: var(--bg-surface);
+    color: var(--text-light);
+    border-radius: 8px;
+  }
+  
+  .form-control, .form-select {
+    background: #121212;
+    color: var(--text-light);
+    border: 1px solid #444;
+  }
+  
+  .form-control:focus, .form-select:focus {
+    box-shadow: 0 0 0 2px rgba(227,6,19,0.5);
+  }
+  
+  .btn-success {
+    background: var(--accent);
+    border: none;
+  }
+  
+  .btn-success:hover {
+    filter: brightness(0.9);
+  }
+  
+  .password-group input {
+    /* contraseña opcional en edición: sólo es obligatoria en creación */
+  }
+  

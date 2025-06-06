@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Promociones — CRM ViviendaCión</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="data:,">
+
+  <!-- Bootstrap CSS -->
+  <link 
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
+    rel="stylesheet"
+  />
+  <!-- Font Awesome -->
+  <link 
+    rel="stylesheet" 
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
+  />
+
+  <style>
+    :root {
+      --dark-bg: #121212;
+      --dark-secondary: #1e1e2e;
+      --dark-tertiary: #2d2d42;
+      --text-light: #e0e0e0;
+      --text-muted: #adb5bd;
+      --primary-red: #dc3545;
+    }
+    body {
+      background-color: var(--dark-bg);
+      color: var(--text-light);
+      padding-bottom: 2rem;
+    }
+    .nav-tabs .nav-link { color: var(--text-muted); }
+    .nav-tabs .nav-link.active {
+      background-color: var(--primary-red);
+      color: #fff;
+    }
+    .form-select, .form-control.bg-secondary {
+      background: var(--dark-tertiary) !important;
+      color: var(--text-light);
+      border: 1px solid #555;
+    }
+    .form-control.bg-secondary::placeholder { color: var(--text-muted); }
+    .btn-outline-light:hover {
+      background: var(--primary-red);
+      border-color: var(--primary-red);
+    }
+    #map {
+      width: 100%;
+      height: 300px;
+      border: 1px solid #555;
+      border-radius: 4px;
+      margin-top: 1rem;
+    }
+    #addressDisplay {
+      background: var(--dark-secondary);
+      padding: .5rem 1rem;
+      border-radius: 4px;
+      display: none;
+      margin-top: 1rem;
+      align-items: center;
+    }
+    #addressDisplay i { color: var(--primary-red); }
+    #promoMessage {
+      background: var(--dark-secondary);
+      padding: 1rem;
+      border-radius: 4px;
+      margin-top: 1rem;
+      font-style: italic;
+      color: var(--text-light);
+    }
+    .filter-container {
+      background: var(--dark-tertiary);
+      padding: 1rem;
+      border-radius: .25rem;
+      margin-bottom: 1rem;
+    }
+    .table-responsive {
+      background: var(--dark-secondary);
+      padding: .5rem;
+      border-radius: .25rem;
+    }
+    .table-dark th {
+      background: var(--dark-tertiary);
+    }
+    img.promo-thumb {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <!-- NAV TABS -->
+  <ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+      <a href="vendedores.html" class="nav-link"><i class="fas fa-users me-2"></i>Vendedores</a>
+    </li>
+    <li class="nav-item">
+      <a href="turnos.html" class="nav-link"><i class="fas fa-calendar-alt me-2"></i>Turnos</a>
+    </li>
+    <li class="nav-item">
+      <a href="promociones.html" class="nav-link active"><i class="fas fa-bullhorn me-2"></i>Promociones</a>
+    </li>
+  </ul>
+
+  <div class="container">
+    <div id="notificationArea"></div>
+    <h2 class="mb-4"><i class="fas fa-bullhorn me-2"></i>Sección de Promociones</h2>
+
+    <!-- FORMULARIO -->
+    <form id="promociones-form" class="mb-5">
+      <div class="row g-3 align-items-end">
+        <!-- Modelo -->
+        <div class="col-md-4">
+          <label for="modelo-promocion" class="form-label">Modelo</label>
+          <select id="modelo-promocion" class="form-select bg-secondary" required></select>
+        </div>
+        <div class="col-md-1">
+          <button type="button" class="btn btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#modalModelo">
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+        <!-- Tipo -->
+        <div class="col-md-4">
+          <label for="tipo-promocion" class="form-label">Tipo</label>
+          <select id="tipo-promocion" class="form-select bg-secondary" required></select>
+        </div>
+        <div class="col-md-1">
+          <button type="button" class="btn btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#modalTipo">
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Ubicación -->
+      <div class="mt-4">
+        <label for="ubicacion-promocion" class="form-label">Ubicación</label>
+        <div class="input-group">
+          <input
+            id="ubicacion-promocion"
+            type="text"
+            class="form-control bg-secondary"
+            placeholder="Escribí una dirección..."
+            autocomplete="off"
+            required
+          />
+          <button class="btn btn-outline-light" type="button" id="btnUsarGPS" title="Usar GPS">
+            <i class="fas fa-location-arrow"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="addressDisplay" class="d-flex">
+        <i class="fas fa-map-marker-alt me-2"></i>
+        <span id="addressText" class="flex-grow-1"></span>
+        <button type="button" id="btnEditAddress" class="btn btn-sm btn-outline-light ms-2" title="Editar dirección">
+          <i class="fas fa-pen"></i>
+        </button>
+      </div>
+
+      <!-- Mensaje dinámico -->
+      <div id="promoMessage">
+        Seleccioná un modelo, tipo, lugar, fechas, horarios e imagen para ver el mensaje.
+      </div>
+
+      <!-- Fechas y horarios -->
+      <div class="row g-3 mt-3">
+        <div class="col-md-3">
+          <label for="start-date" class="form-label">Fecha inicio</label>
+          <input type="date" id="start-date" class="form-control bg-secondary" />
+        </div>
+        <div class="col-md-3">
+          <label for="end-date" class="form-label">Fecha fin</label>
+          <input type="date" id="end-date" class="form-control bg-secondary" />
+        </div>
+        <div class="col-md-3">
+          <label for="start-time" class="form-label">Hora inicio</label>
+          <input type="time" id="start-time" class="form-control bg-secondary" />
+        </div>
+        <div class="col-md-3">
+          <label for="end-time" class="form-label">Hora fin</label>
+          <input type="time" id="end-time" class="form-control bg-secondary" />
+        </div>
+      </div>
+
+      <!-- Imagen -->
+      <div class="mt-3">
+        <label for="promo-image" class="form-label">Imagen de Promoción</label>
+        <input type="file" id="promo-image" class="form-control bg-secondary" accept="image/*" />
+      </div>
+
+      <!-- Radio -->
+      <div class="mt-4">
+        <label for="radio-promocion" class="form-label">
+          Radio: <span id="radio-value">100</span> m
+        </label>
+        <input
+          id="radio-promocion"
+          type="range"
+          class="form-range"
+          min="100"
+          max="100000"
+          step="100"
+          value="100"
+        />
+      </div>
+
+      <!-- Mapa -->
+      <div id="map"></div>
+
+      <!-- Botones -->
+      <div class="d-flex justify-content-between mt-4">
+        <button type="button" id="btnLimpiar" class="btn btn-outline-light">
+          <i class="fas fa-broom me-2"></i>Limpiar
+        </button>
+        <button type="submit" class="btn btn-danger" id="submitBtn">
+          <span id="submitText"><i class="fas fa-bullhorn me-2"></i>Generar Promoción</span>
+          <span class="spinner-border spinner-border-sm d-none" id="submitSpinner"></span>
+        </button>
+      </div>
+    </form>
+
+    <hr class="border-secondary">
+
+    <!-- Filtros -->
+    <div class="filter-container mb-4">
+      <h4><i class="fas fa-filter me-2"></i>Filtrar Promociones</h4>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label for="filterModelo" class="form-label">Modelo</label>
+          <select id="filterModelo" class="form-select bg-secondary">
+            <option value="">Todos</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="filterTipo" class="form-label">Tipo</label>
+          <select id="filterTipo" class="form-select bg-secondary">
+            <option value="">Todos</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="filterUbicacion" class="form-label">Ubicación</label>
+          <input
+            id="filterUbicacion"
+            type="text"
+            class="form-control bg-secondary"
+            placeholder="Buscar ubicación..."
+          />
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <button type="button" id="btnResetFilters" class="btn btn-outline-light w-100">
+            <i class="fas fa-sync-alt me-2"></i>Resetear
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Listado y export -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3><i class="fas fa-list me-2"></i>Listado de Promociones</h3>
+      <div>
+        <button id="btnExportCSV" class="btn btn-outline-light me-2">
+          <i class="fas fa-file-csv"></i>
+        </button>
+        <button id="btnExportExcel" class="btn btn-outline-light">
+          <i class="fas fa-file-excel"></i>
+        </button>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-dark table-hover" id="promociones-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Modelo</th>
+            <th>Tipo</th>
+            <th>Ubicación</th>
+            <th>Radio</th>
+            <th>Ciudades</th>
+            <th>Período</th>
+            <th>Horario</th>
+            <th>Imagen</th>
+            <th>Enviar</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    <nav class="mt-4">
+      <ul class="pagination justify-content-center">
+        <li class="page-item disabled" id="prevPage"><a class="page-link" href="#">Anterior</a></li>
+        <li class="page-item" id="nextPage"><a class="page-link" href="#">Siguiente</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Modal Nuevo Modelo -->
+  <div class="modal fade" id="modalModelo" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content bg-dark text-light">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-home me-2"></i>Nuevo Modelo</h5>
+          <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input id="inputNuevoModelo" class="form-control bg-secondary" placeholder="Nombre del modelo">
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button class="btn btn-danger" id="saveModeloBtn">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Nuevo Tipo -->
+  <div class="modal fade" id="modalTipo" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content bg-dark text-light">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-tag me-2"></i>Nuevo Tipo</h5>
+          <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input id="inputNuevoTipo" class="form-control bg-secondary" placeholder="Nombre del tipo">
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button class="btn btn-danger" id="saveTipoBtn">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Editar Promoción -->
+  <div class="modal fade" id="modalEditar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content bg-dark text-light">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Editar Promoción</h5>
+          <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="editId">
+          <div class="mb-3">
+            <label class="form-label">Modelo</label>
+            <select id="editModelo" class="form-select bg-secondary"></select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Tipo</label>
+            <select id="editTipo" class="form-select bg-secondary"></select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Ubicación</label>
+            <input id="editUbicacion" class="form-control bg-secondary">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Radio: <span id="editRadioValue">100</span> m</label>
+            <input id="editRadio" type="range" class="form-range" min="100" max="100000" step="100" value="100">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button class="btn btn-danger" id="saveEditBtn">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB-C_IPlrBJMHXeSILeOjnyTqd2-jVKRig&libraries=places&callback=initGoogleMap"
+    async defer
+  ></script>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Datos & config
+    let modelos = JSON.parse(localStorage.getItem('modelos')) || [];
+    let tipos   = JSON.parse(localStorage.getItem('tipos'))   || [];
+    let promos  = JSON.parse(localStorage.getItem('promociones')) || [];
+    const itemsPerPage = 5;
+    let currentPage = 1;
+
+    // DOM shortcuts
+    const modeloSel     = document.getElementById('modelo-promocion');
+    const tipoSel       = document.getElementById('tipo-promocion');
+    const filterMod     = document.getElementById('filterModelo');
+    const filterTip     = document.getElementById('filterTipo');
+    const filterUb      = document.getElementById('filterUbicacion');
+    const tableBody     = document.querySelector('#promociones-table tbody');
+    const prevBtn       = document.getElementById('prevPage');
+    const nextBtn       = document.getElementById('nextPage');
+    const saveModBtn    = document.getElementById('saveModeloBtn');
+    const saveTipBtn    = document.getElementById('saveTipoBtn');
+    const inMod         = document.getElementById('inputNuevoModelo');
+    const inTip         = document.getElementById('inputNuevoTipo');
+    const editModSel    = document.getElementById('editModelo');
+    const editTipSel    = document.getElementById('editTipo');
+    const editUbInput   = document.getElementById('editUbicacion');
+    const editRadio     = document.getElementById('editRadio');
+    const editRadioVal  = document.getElementById('editRadioValue');
+    const editIdInput   = document.getElementById('editId');
+    const saveEditBtn   = document.getElementById('saveEditBtn');
+    const btnExportCSV  = document.getElementById('btnExportCSV');
+    const btnExportExcel= document.getElementById('btnExportExcel');
+    const btnResetFilt  = document.getElementById('btnResetFilters');
+    const notificationArea = document.getElementById('notificationArea');
+
+    const ubicInput     = document.getElementById('ubicacion-promocion');
+    const btnGPS        = document.getElementById('btnUsarGPS');
+    const addressDisp   = document.getElementById('addressDisplay');
+    const addressText   = document.getElementById('addressText');
+    const btnEditAddr   = document.getElementById('btnEditAddress');
+    const radioRange    = document.getElementById('radio-promocion');
+    const radioValue    = document.getElementById('radio-value');
+    const btnLimpiar    = document.getElementById('btnLimpiar');
+    const form          = document.getElementById('promociones-form');
+    const submitBtn     = document.getElementById('submitBtn');
+    const submitText    = document.getElementById('submitText');
+    const submitSpinner = document.getElementById('submitSpinner');
+    const promoMsg      = document.getElementById('promoMessage');
+
+    const startDateInput = document.getElementById('start-date');
+    const endDateInput   = document.getElementById('end-date');
+    const startTimeInput = document.getElementById('start-time');
+    const endTimeInput   = document.getElementById('end-time');
+    const imageInput     = document.getElementById('promo-image');
+
+    let currentCity = '';
+    let currentPlace = '';
+
+    // Utilidades
+    function showNotification(msg, type='success') {
+      const types = {
+        success: 'bg-success',
+        error:   'bg-danger',
+        warning: 'bg-warning text-dark',
+        info:    'bg-info text-dark'
+      };
+      notificationArea.innerHTML = '';
+      const n = document.createElement('div');
+      n.className = `notification alert ${types[type]} alert-dismissible fade show`;
+      n.innerHTML = `
+        <i class="fas ${type==='success'?'fa-check-circle':type==='error'?'fa-exclamation-circle':type==='warning'?'fa-exclamation-triangle':'fa-info-circle'} me-2"></i>
+        ${msg}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+      notificationArea.appendChild(n);
+      setTimeout(() => n.classList.add('fade'), 4500);
+    }
+    function debounce(fn, ms=300) {
+      let t;
+      return (...args) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...args), ms);
+      };
+    }
+
+    // Mensaje dinámico
+    function updatePromoMessage() {
+      const m = modeloSel.value;
+      const t = tipoSel.value;
+      if (m && t && currentCity) {
+        let dateText = '';
+        if (startDateInput.value && endDateInput.value) {
+          const s = startDateInput.value.split('-').reverse().join('/');
+          const e = endDateInput.value.split('-').reverse().join('/');
+          dateText = ` desde el día ${s} al ${e}`;
+        }
+        let timeText = '';
+        if (startTimeInput.value && endTimeInput.value) {
+          timeText = ` de ${startTimeInput.value} a ${endTimeInput.value}`;
+        }
+        let msg = `Tenemos una promoción de ${t.toLowerCase()} en el modelo ${m}. Vamos a estar en ${currentCity}`;
+        if (currentPlace) msg += `, en ${currentPlace}`;
+        msg += dateText + timeText + `, ¿te interesa que agendemos una reunión?`;
+        promoMsg.textContent = msg;
+      } else if (!m && !t) {
+        promoMsg.textContent = 'Seleccioná un modelo y un tipo para ver el mensaje de promoción.';
+      } else if (!m) {
+        promoMsg.textContent = 'Seleccioná un modelo para generar el mensaje.';
+      } else {
+        promoMsg.textContent = 'Seleccioná un tipo de promoción para generar el mensaje.';
+      }
+    }
+    modeloSel.addEventListener('change', updatePromoMessage);
+    tipoSel.addEventListener('change',   updatePromoMessage);
+    startDateInput.addEventListener('change', updatePromoMessage);
+    endDateInput.addEventListener('change',   updatePromoMessage);
+    startTimeInput.addEventListener('change', updatePromoMessage);
+    endTimeInput.addEventListener('change',   updatePromoMessage);
+
+    // Refrescar selects
+    function refreshModelos() {
+      modeloSel.innerHTML = modelos.map(m => `<option>${m}</option>`).join('');
+      editModSel.innerHTML = modeloSel.innerHTML;
+      filterMod.innerHTML   = '<option value="">Todos</option>' + modeloSel.innerHTML;
+      updatePromoMessage();
+    }
+    function refreshTipos() {
+      tipoSel.innerHTML = tipos.map(t => `<option>${t}</option>`).join('');
+      editTipSel.innerHTML = tipoSel.innerHTML;
+      filterTip.innerHTML   = '<option value="">Todos</option>' + tipoSel.innerHTML;
+      updatePromoMessage();
+    }
+    refreshModelos();
+    refreshTipos();
+
+    // Guardar modelo/tipo
+    saveModBtn.onclick = () => {
+      const v = inMod.value.trim();
+      if (!v) return showNotification('Ingrese un nombre para el modelo','error');
+      if (modelos.includes(v)) return showNotification('Este modelo ya existe','warning');
+      modelos.push(v);
+      localStorage.setItem('modelos', JSON.stringify(modelos));
+      inMod.value = '';
+      refreshModelos();
+      showNotification('Modelo agregado correctamente');
+      bootstrap.Modal.getInstance(document.getElementById('modalModelo')).hide();
+    };
+    saveTipBtn.onclick = () => {
+      const v = inTip.value.trim();
+      if (!v) return showNotification('Ingrese un nombre para el tipo','error');
+      if (tipos.includes(v)) return showNotification('Este tipo ya existe','warning');
+      tipos.push(v);
+      localStorage.setItem('tipos', JSON.stringify(tipos));
+      inTip.value = '';
+      refreshTipos();
+      showNotification('Tipo agregado correctamente');
+      bootstrap.Modal.getInstance(document.getElementById('modalTipo')).hide();
+    };
+
+    // Init Google Map + Autocomplete
+    window.initGoogleMap = () => {
+      const defaultCenter = { lat:-31.4167, lng:-64.1833 };
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: defaultCenter,
+        zoom: 5
+      });
+      marker = new google.maps.Marker({ map, draggable: true });
+      circle = new google.maps.Circle({
+        map,
+        center: defaultCenter,
+        radius: Number(radioRange.value),
+        strokeColor: '#dc3545',
+        strokeOpacity: 0.4,
+        strokeWeight: 1,
+        fillColor: '#dc3545',
+        fillOpacity: 0.1
+      });
+      marker.addListener('dragend', () => {
+        const p = marker.getPosition();
+        circle.setCenter(p);
+      });
+      autocomplete = new google.maps.places.Autocomplete(ubicInput, {
+        types: ['geocode'],
+        componentRestrictions: { country: 'ar' },
+        fields: ['geometry','formatted_address','address_components','name']
+      });
+      autocomplete.bindTo('bounds', map);
+      autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+        if (!place.geometry) return;
+
+        currentCity = '';
+        if (place.address_components) {
+          const comp = place.address_components
+            .find(c => c.types.includes('locality') || c.types.includes('administrative_area_level_1'));
+          if (comp) currentCity = comp.long_name;
+        }
+        currentPlace = place.name || '';
+
+        addressText.textContent = place.formatted_address;
+        addressDisp.style.display = 'flex';
+
+        if (place.geometry.viewport) {
+          map.fitBounds(place.geometry.viewport);
+        } else {
+          map.setCenter(place.geometry.location);
+          map.setZoom(15);
+        }
+        marker.setPosition(place.geometry.location);
+        circle.setCenter(place.geometry.location);
+        circle.setRadius(Number(radioRange.value));
+
+        updatePromoMessage();
+      });
+    };
+
+    // Edit address
+    btnEditAddr.addEventListener('click', () => {
+      addressDisp.style.display = 'none';
+      ubicInput.focus();
+    });
+
+    // GPS
+    btnGPS.addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        return showNotification('Geolocalización no soportada','error');
+      }
+      navigator.geolocation.getCurrentPosition(pos => {
+        const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        map.setCenter(loc);
+        map.setZoom(15);
+        marker.setPosition(loc);
+        circle.setCenter(loc);
+      }, () => showNotification('No fue posible obtener tu ubicación','error'));
+    });
+
+    // Radio slider
+    radioRange.addEventListener('input', () => {
+      radioValue.textContent = radioRange.value;
+      circle.setRadius(Number(radioRange.value));
+    });
+
+    // Limpiar form
+    btnLimpiar.addEventListener('click', () => {
+      form.reset();
+      addressDisp.style.display = 'none';
+      const def = { lat:-31.4167, lng:-64.1833 };
+      map.setCenter(def);
+      map.setZoom(5);
+      marker.setPosition(null);
+      circle.setCenter(def);
+      circle.setRadius(100);
+      radioValue.textContent = '100';
+      updatePromoMessage();
+    });
+
+    // Filter, paginate, render
+    function filterPromos() {
+      return promos.filter(p =>
+        (!filterMod.value || p.modelo === filterMod.value) &&
+        (!filterTip.value || p.tipo === filterTip.value) &&
+        (!filterUb.value || p.ubicacion.toLowerCase().includes(filterUb.value.toLowerCase()))
+      );
+    }
+    function updatePagination(totalItems) {
+      const totalPages = Math.max(1, Math.ceil(totalItems/itemsPerPage));
+      document.querySelectorAll('.pagination .page-item:not(#prevPage):not(#nextPage)').forEach(el=>el.remove());
+      for (let i=1; i<=totalPages; i++){
+        const li = document.createElement('li');
+        li.className = `page-item ${i===currentPage?'active':''}`;
+        li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+        li.addEventListener('click', e=>{e.preventDefault();renderPromos(i);});
+        nextBtn.before(li);
+      }
+      prevBtn.classList.toggle('disabled', currentPage===1);
+      nextBtn.classList.toggle('disabled', currentPage===totalPages);
+      prevBtn.querySelector('a').onclick = e=>{e.preventDefault();if(currentPage>1)renderPromos(currentPage-1);};
+      nextBtn.querySelector('a').onclick = e=>{e.preventDefault();if(currentPage<totalPages)renderPromos(currentPage+1);};
+    }
+    function renderPromos(page=1) {
+      currentPage = page;
+      const arr = filterPromos();
+      tableBody.innerHTML = '';
+      if (!arr.length) {
+        tableBody.innerHTML = `<tr><td colspan="11" class="text-center py-4">
+          <i class="fas fa-exclamation-circle me-2"></i>No se encontraron promociones
+        </td></tr>`;
+        updatePagination(0);
+        return;
+      }
+      const slice = arr.slice((page-1)*itemsPerPage, page*itemsPerPage);
+      slice.forEach(p => {
+        const idx = promos.findIndex(x=>x.id===p.id);
+        const period = p.startDate && p.endDate
+          ? `${p.startDate.split('-').reverse().join('/')} - ${p.endDate.split('-').reverse().join('/')}`
+          : '';
+        const schedule = p.startTime && p.endTime
+          ? `${p.startTime} - ${p.endTime}` : '';
+        const imgTag = p.image
+          ? `<img src="${p.image}" class="promo-thumb" />` : '';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${idx+1}</td>
+          <td>${p.modelo}</td>
+          <td>${p.tipo}</td>
+          <td>${p.ubicacion}</td>
+          <td>${p.radio} m</td>
+          <td>${p.ciudades||'<span class="text-muted">...</span>'}</td>
+          <td>${period}</td>
+          <td>${schedule}</td>
+          <td>${imgTag}</td>
+          <td>
+            <button class="btn btn-sm btn-primary btn-send" title="Enviar">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-warning me-2 btn-edit"><i class="fas fa-edit"></i></button>
+            <button class="btn btn-sm btn-danger btn-delete"><i class="fas fa-trash-alt"></i></button>
+          </td>`;
+        tableBody.appendChild(tr);
+
+        // Enviar
+        tr.querySelector('.btn-send').onclick = () => {
+          window.open(
+            `enviar.html?id=${p.id}`,
+            'EnviarPromocion',
+            'width=600,height=600,top=100,left=100'
+          );
+        };
+
+        // Eliminar
+        tr.querySelector('.btn-delete').onclick = () => {
+          if (confirm('¿Eliminar esta promoción?')) {
+            promos.splice(idx,1);
+            localStorage.setItem('promociones', JSON.stringify(promos));
+            renderPromos(currentPage);
+            showNotification('Promoción eliminada','success');
+          }
+        };
+
+        // Editar
+        tr.querySelector('.btn-edit').onclick = () => {
+          editIdInput.value   = p.id;
+          editModSel.value    = p.modelo;
+          editTipSel.value    = p.tipo;
+          editUbInput.value   = p.ubicacion;
+          editRadio.value     = p.radio;
+          editRadioVal.textContent = p.radio;
+          new bootstrap.Modal(document.getElementById('modalEditar')).show();
+        };
+      });
+      updatePagination(arr.length);
+    }
+
+    // Crear promoción
+    form.onsubmit = e => {
+      e.preventDefault();
+      if (!modeloSel.value||!tipoSel.value||!ubicInput.value.trim()) {
+        return showNotification('Complete todos los campos requeridos','error');
+      }
+      const pos = marker.getPosition();
+      if (!pos) return showNotification('Seleccione una ubicación en el mapa','error');
+
+      submitBtn.disabled = true;
+      submitSpinner.classList.remove('d-none');
+      submitText.textContent = 'Procesando...';
+
+      const file = imageInput.files[0];
+      const readAndSave = imageData => {
+        const nueva = {
+          id: Date.now(),
+          modelo: modeloSel.value,
+          tipo: tipoSel.value,
+          ubicacion: ubicInput.value,
+          radio: Number(radioRange.value),
+          lat: pos.lat(), lon: pos.lng(),
+          ciudades: '',
+          fecha: new Date().toISOString(),
+          startDate: startDateInput.value,
+          endDate: endDateInput.value,
+          startTime: startTimeInput.value,
+          endTime: endTimeInput.value,
+          image: imageData || ''
+        };
+        promos.push(nueva);
+        localStorage.setItem('promociones', JSON.stringify(promos));
+        const q = `[out:json];node["place"~"city|town|village"](around:${nueva.radio},${nueva.lat},${nueva.lon});out;`;
+        fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(q)}`)
+          .then(r=>r.json())
+          .then(data=> {
+            nueva.ciudades = [...new Set(data.elements.map(el=>el.tags?.name).filter(Boolean))].join(', ');
+          })
+          .catch(()=> nueva.ciudades='N/A')
+          .finally(()=> {
+            localStorage.setItem('promociones', JSON.stringify(promos));
+            renderPromos();
+            showNotification('Promoción creada correctamente','success');
+            submitBtn.disabled = false;
+            submitSpinner.classList.add('d-none');
+            submitText.textContent = 'Generar Promoción';
+          });
+      };
+
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => readAndSave(reader.result);
+        reader.readAsDataURL(file);
+      } else {
+        readAndSave('');
+      }
+    };
+
+    // Guardar edición (solo modelo/tipo/ubicación/radio)
+    saveEditBtn.onclick = () => {
+      const id = +editIdInput.value;
+      const idx = promos.findIndex(p=>p.id===id);
+      if (idx<0) return showNotification('Promoción no encontrada','error');
+      promos[idx] = {
+        ...promos[idx],
+        modelo: editModSel.value,
+        tipo: editTipSel.value,
+        ubicacion: editUbInput.value,
+        radio: Number(editRadio.value)
+      };
+      localStorage.setItem('promociones', JSON.stringify(promos));
+      renderPromos(currentPage);
+      showNotification('Promoción actualizada correctamente','success');
+      bootstrap.Modal.getInstance(document.getElementById('modalEditar')).hide();
+    };
+
+    // Filtros y export
+    filterMod.onchange = ()=> renderPromos();
+    filterTip.onchange = ()=> renderPromos();
+    filterUb.addEventListener('input', debounce(()=> renderPromos(), 300));
+    btnResetFilt.onclick = ()=> {
+      filterMod.value = '';
+      filterTip.value = '';
+      filterUb.value  = '';
+      renderPromos();
+      showNotification('Filtros reseteados','info');
+    };
+
+    btnExportCSV.onclick = ()=> {
+      const data = filterPromos();
+      if (!data.length) return showNotification('No hay datos para exportar','warning');
+      let csv = 'ID,Modelo,Tipo,Ubicación,Radio (m),Ciudades,Periodo,Horario,Fecha\n';
+      data.forEach(p => {
+        const period = p.startDate && p.endDate
+          ? `${p.startDate} - ${p.endDate}` : '';
+        const schedule = p.startTime && p.endTime
+          ? `${p.startTime} - ${p.endTime}` : '';
+        csv += `"${p.id}","${p.modelo}","${p.tipo}","${p.ubicacion}","${p.radio}","${p.ciudades}","${period}","${schedule}","${new Date(p.fecha).toLocaleString()}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.setAttribute('download', `promociones_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showNotification('Datos exportados a CSV','success');
+    };
+
+    btnExportExcel.onclick = ()=> {
+      const data = filterPromos();
+      if (!data.length) return showNotification('No hay datos para exportar','warning');
+      const sheet = data.map(p=>({
+        ID: p.id,
+        Modelo: p.modelo,
+        Tipo: p.tipo,
+        Ubicación: p.ubicacion,
+        'Radio (m)': p.radio,
+        Ciudades: p.ciudades,
+        Periodo: p.startDate && p.endDate
+          ? `${p.startDate} - ${p.endDate}` : '',
+        Horario: p.startTime && p.endTime
+          ? `${p.startTime} - ${p.endTime}` : '',
+        Fecha: new Date(p.fecha).toLocaleString()
+      }));
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(sheet);
+      XLSX.utils.book_append_sheet(wb, ws, 'Promociones');
+      XLSX.writeFile(wb, `promociones_${new Date().toISOString().slice(0,10)}.xlsx`);
+      showNotification('Datos exportados a Excel','success');
+    };
+
+    // Inicial
+    renderPromos();
+    updatePromoMessage();
+  });
+  </script>
+</body>
+</html>

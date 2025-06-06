@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Agenda de Turnos</title>
+  <link rel="stylesheet" href="/assets/css/calendar.css" />
+</head>
+<body>
+  <header>
+    <h1>📅 Agenda de Turnos</h1>
+    <p>Completa el formulario para solicitar tu turno.</p>
+  </header>
+
+  <main>
+    <form id="calendar-form">
+      <div class="form-row">
+        <label for="name">Nombre:</label>
+        <input type="text" id="name" name="name" required />
+      </div>
+      <div class="form-row">
+        <label for="date">Fecha:</label>
+        <input type="date" id="date" name="date" required />
+      </div>
+      <div class="form-row">
+        <label for="time">Hora:</label>
+        <input type="time" id="time" name="time" required />
+      </div>
+      <div class="form-row">
+        <label for="purpose">Propósito:</label>
+        <input type="text" id="purpose" name="purpose" required />
+      </div>
+      <button type="submit">Agendar Turno</button>
+    </form>
+
+    <section id="agenda-list">
+      <h2>Turnos Solicitados</h2>
+      <ul id="appointments"></ul>
+    </section>
+  </main>
+
+  <script src="/calendar.bundle.js"></script>
+</body>
+</html>
