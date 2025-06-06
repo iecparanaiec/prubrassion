@@ -158,12 +158,12 @@
 
     <!-- Pestaña SERVICIOS -->
     <div class="tab-pane fade" id="servicios">
-      <form id="formService" class="mb-4">
+      <form id="formService" class="mb-4" onsubmit="return false;">
         <label class="form-label">Nombre Servicio</label>
         <input id="svcName" class="form-control mb-2" required>
         <label class="form-label">Descripción</label>
         <textarea id="svcDesc" class="form-control mb-2"></textarea>
-        <button type="submit" class="btn btn-red">
+        <button id="saveService" type="button" class="btn btn-red">
           <i class="fas fa-save me-1"></i> Guardar Servicio
         </button>
       </form>
@@ -364,14 +364,14 @@
         });
       }
       renderServices();
-      formService.addEventListener('submit', e => {
-        e.preventDefault();
+      document.getElementById('saveService').addEventListener('click', () => {
         const nombre = svcNameInp.value.trim();
         const desc   = svcDescInp.value.trim();
         if (!nombre) return;
         servicios.push({ nombre, descripcion: desc });
         localStorage.setItem('servicios', JSON.stringify(servicios));
-        formService.reset(); renderServices();
+        formService.reset();
+        renderServices();
       });
       svcTable.addEventListener('click', e => {
         const btn = e.target.closest('.btn-delete'); if (!btn) return;
