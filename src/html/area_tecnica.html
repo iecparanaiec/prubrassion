@@ -158,12 +158,12 @@
 
     <!-- Pestaña SERVICIOS -->
     <div class="tab-pane fade" id="servicios">
-      <form id="formService" class="mb-4">
+      <form id="formService" class="mb-4" onsubmit="return false;">
         <label class="form-label">Nombre Servicio</label>
         <input id="svcName" class="form-control mb-2" required>
         <label class="form-label">Descripción</label>
         <textarea id="svcDesc" class="form-control mb-2"></textarea>
-        <button type="submit" class="btn btn-red">
+        <button id="saveService" type="button" class="btn btn-red">
           <i class="fas fa-save me-1"></i> Guardar Servicio
         </button>
       </form>
@@ -176,8 +176,38 @@
 
     <!-- Pestaña GESTIÓN DE ARCHIVOS -->
     <div class="tab-pane fade" id="gestionArchivos">
-      <!-- Aquí tu gestión de archivos -->
-       
+      <div class="mb-3">
+        <label class="form-label">Todos los clientes</label>
+        <div class="d-flex gap-2">
+          <input type="file" id="fileTodos" class="form-control" accept=".xls,.xlsx">
+          <button class="btn btn-red" id="btnTodosUpload"><i class="fas fa-upload me-1"></i>Subir</button>
+          <button class="btn btn-gray" id="btnTodosExport"><i class="fas fa-file-export me-1"></i>Exportar</button>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">VM3</label>
+        <div class="d-flex gap-2">
+          <input type="file" id="fileVM3" class="form-control" accept=".xls,.xlsx">
+          <button class="btn btn-red" id="btnVM3Upload"><i class="fas fa-upload me-1"></i>Subir</button>
+          <button class="btn btn-gray" id="btnVM3Export"><i class="fas fa-file-export me-1"></i>Exportar</button>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Reuniones Anexo</label>
+        <div class="d-flex gap-2">
+          <input type="file" id="fileReuniones" class="form-control" accept=".xls,.xlsx">
+          <button class="btn btn-red" id="btnReunionesUpload"><i class="fas fa-upload me-1"></i>Subir</button>
+          <button class="btn btn-gray" id="btnReunionesExport"><i class="fas fa-file-export me-1"></i>Exportar</button>
+        </div>
+      </div>
+      <div>
+        <label class="form-label">Vencidos</label>
+        <div class="d-flex gap-2">
+          <input type="file" id="fileVencidos" class="form-control" accept=".xls,.xlsx">
+          <button class="btn btn-red" id="btnVencidosUpload"><i class="fas fa-upload me-1"></i>Subir</button>
+          <button class="btn btn-gray" id="btnVencidosExport"><i class="fas fa-file-export me-1"></i>Exportar</button>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -185,6 +215,7 @@
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       /* ==== CARGAR CLIENTES ==== */
@@ -250,7 +281,21 @@
             new bootstrap.Modal(document.getElementById('dayAppointmentsModal')).show();
           }
         }
-      ); calendar.render();
+      );
+      let calendarInitialized = false;
+      const turnosTabBtn = document.querySelector('#areaTabs [data-bs-target="#turnos"]');
+      turnosTabBtn.addEventListener('shown.bs.tab', () => {
+        if (!calendarInitialized) {
+          calendar.render();
+          calendarInitialized = true;
+        } else {
+          calendar.updateSize();
+        }
+      });
+      if (turnosTabBtn.classList.contains('active')) {
+        calendar.render();
+        calendarInitialized = true;
+      }
       // Actualizar Turnos Hoy
       function updateToday() {
         const today = new Date().toISOString().split('T')[0];
@@ -319,14 +364,14 @@
         });
       }
       renderServices();
-      formService.addEventListener('submit', e => {
-        e.preventDefault();
+      document.getElementById('saveService').addEventListener('click', () => {
         const nombre = svcNameInp.value.trim();
         const desc   = svcDescInp.value.trim();
         if (!nombre) return;
         servicios.push({ nombre, descripcion: desc });
         localStorage.setItem('servicios', JSON.stringify(servicios));
-        formService.reset(); renderServices();
+        formService.reset();
+        renderServices();
       });
       svcTable.addEventListener('click', e => {
         const btn = e.target.closest('.btn-delete'); if (!btn) return;
@@ -336,7 +381,47 @@
       });
 
       /* ==== GESTIÓN DE ARCHIVOS ==== */
-      // aquí tu lógica de subida/exportación
+      const sheets = {
+        todos:     { file:'fileTodos', upload:'btnTodosUpload', export:'btnTodosExport', expected:'Nro Contrato' },
+        vm3:       { file:'fileVM3', upload:'btnVM3Upload', export:'btnVM3Export', expected:'Cliente' },
+        reuniones: { file:'fileReuniones', upload:'btnReunionesUpload', export:'btnReunionesExport', expected:'Nro Contrato' },
+        vencidos:  { file:'fileVencidos', upload:'btnVencidosUpload', export:'btnVencidosExport', expected:'Nro Contrato' }
+      };
+
+      function parseSheet(key, raw) {
+        const wb = XLSX.read(raw, { type:'binary' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const all = XLSX.utils.sheet_to_json(ws, { header:1, defval:'' });
+        const idx = all.findIndex(r => r.includes(sheets[key].expected));
+        if (idx < 0) return alert('No se encontró la cabecera para ' + key);
+        const headers = all[idx].map(h => { const t = String(h).trim(); return t && !/EMPTY/.test(t) ? t : null; });
+        const data = all.slice(idx+1)
+          .map(r => { let o = {}; headers.forEach((h,i)=>{ if(h) o[h]=r[i]; }); return o; })
+          .filter(r => Object.values(r).some(v => v !== ''));
+        localStorage.setItem(key + '_data', JSON.stringify(data));
+        alert('Datos guardados en ' + key);
+      }
+
+      Object.keys(sheets).forEach(key => {
+        const cfg = sheets[key];
+        const fileInput = document.getElementById(cfg.file);
+        document.getElementById(cfg.upload).addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', e => {
+          const f = e.target.files[0]; if (!f) return;
+          const r = new FileReader();
+          r.onload = ev => parseSheet(key, ev.target.result);
+          r.readAsBinaryString(f);
+          e.target.value='';
+        });
+        document.getElementById(cfg.export).addEventListener('click', () => {
+          const data = JSON.parse(localStorage.getItem(key + '_data') || '[]');
+          if (!data.length) return alert('No hay datos para exportar');
+          const wb = XLSX.utils.book_new();
+          const ws = XLSX.utils.json_to_sheet(data);
+          XLSX.utils.book_append_sheet(wb, ws, key);
+          XLSX.writeFile(wb, `${key}_${new Date().toISOString().slice(0,10)}.xlsx`);
+        });
+      });
     });
   </script>
 </body>
